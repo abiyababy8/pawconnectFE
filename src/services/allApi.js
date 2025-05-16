@@ -13,7 +13,11 @@ export const loginApi = async (data) => {
 export const getUserDetailsApi = async (reqHeader) => {
     return await commonApi("GET", `${base_url}/user/userDetails`, "", reqHeader)
 }
-//get userPets
+//add userPets
 export const addUserPetApi = async (data, reqHeader) => {
     return await commonApi('POST', `${base_url}/user/pets`, data, reqHeader)
+}
+//get userPets
+export const getUserPetApi=async(reqHeader)=>{
+    return await commonApi('GET',`${base_url}/user/pets`,"",reqHeader)
 }
