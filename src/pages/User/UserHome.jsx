@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./userhome.css"; // Import CSS for popup animation
 import { Modal, Button, Form } from 'react-bootstrap'
 import { toast, ToastContainer } from "react-toastify";
-import { addUserPetApi, getUserPetApi } from "../../services/allApi";
+import { addUserPetApi, getUserPetApi, editUserPetApi } from "../../services/allApi";
 import { base_url } from "../../services/base_url";
 
 function UserHome() {
@@ -125,6 +125,47 @@ function UserHome() {
       getUserPet()
     }
   }
+  const handleEditUserPet = async () => {
+    const { name, type, age, health, nextVetAppointment, vaccinations, userPetImage, id } = editPetDetails;
+
+    if (!name || !type || !age || !health || !nextVetAppointment || !vaccinations) {
+      toast.warning("Please fill the form completely!");
+      return;
+    }
+
+    const reqBody = new FormData();
+    reqBody.append("name", name);
+    reqBody.append("type", type);
+    reqBody.append("age", age);
+    reqBody.append("health", health);
+    reqBody.append("nextVetAppointment", nextVetAppointment);
+    reqBody.append("vaccinations", vaccinations);
+
+    // Only append file if it's a new File object
+    if (editPetDetails.userPetImage instanceof File) {
+      reqBody.append("userPetImage", userPetImage);
+    }
+
+    const reqHeader = {
+      "Content-Type": "multipart/form-data",
+      "Authorization": `Bearer ${token}`
+    };
+
+    try {
+      const result = await editUserPetApi(id, reqBody, reqHeader); // You need to implement this API in your `allApi.js`
+      if (result.status === 200) {
+        toast.success(`${name}'s details updated successfully!`);
+        setShow(false);
+        getUserPet(); // Refresh the pet list
+      } else {
+        toast.error("Update failed. Try again!");
+      }
+    } catch (error) {
+      toast.error("Something went wrong!");
+      console.error(error);
+    }
+  };
+
   return (
     <div className="container py-5 text-center position-relative">
       <h2 className="mb-3">Welcome back, {user?.username.toUpperCase() || "Pet Lover"}! 🐾</h2>
@@ -137,7 +178,7 @@ function UserHome() {
           {userPet?.length > 0 ?
             userPet.map((pet) => (
               <div className="col-md-4 mb-3" key={pet.id}>
-                <div className="card shadow-lg rounded-lg overflow-hidden border-0 bg-white" style={{width:"330px"}}>
+                <div className="card shadow-lg rounded-lg overflow-hidden border-0 bg-white" style={{ width: "330px" }}>
                   <img
                     src={`${base_url}/uploads/${pet.userPetImage}`} // Dynamic image source
                     alt={pet.name}
@@ -177,13 +218,14 @@ function UserHome() {
                       onClick={() => {
                         setShow(true)
                         setEditPetDetails({
+                          id: pet._id,
                           name: pet.name,
                           type: pet.type,
                           age: pet.age,
                           health: pet.health,
                           nextVetAppointment: pet.nextVetAppointment,
                           vaccinations: pet.vaccinations,
-                          userPetImage: `${base_url}/uploads/${pet.userPetImage}`,
+                          userPetImage: pet.userPetImage ?`${base_url}/uploads/${pet.userPetImage}`: pet.userPetImage ,
                         });
                       }}
                     >
@@ -367,7 +409,7 @@ function UserHome() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleClose}>
+          <Button variant="primary" onClick={handleEditUserPet}>
             Save Changes
           </Button>
         </Modal.Footer>

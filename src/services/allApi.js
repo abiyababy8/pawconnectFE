@@ -21,3 +21,11 @@ export const addUserPetApi = async (data, reqHeader) => {
 export const getUserPetApi=async(reqHeader)=>{
     return await commonApi('GET',`${base_url}/user/pets`,"",reqHeader)
 }
+//update userPets
+export const editUserPetApi=async(id,reqBody,reqHeader)=>{
+    return await commonApi('PUT',`${base_url}/user/pets/${id}`,reqBody,reqHeader)
+}
+// add lostPets
+export const addLostPetApi = async (data, reqHeader) => {
+    return await commonApi('POST', `${base_url}/lost/pets`, data, reqHeader)
+}
