@@ -5,6 +5,7 @@ import goldenRetriever from '../assets/golden-retriever.jpg';
 import tabbyCat from '../assets/tabby-cat.jpg';
 import beagleDog from '../assets/beagle.jpg';
 import persianCat from '../assets/persian-cat.jpg';
+import { Link } from 'react-router-dom';
 
 // Sample Pet Data (Replace with API later)
 const initialPetData = [
@@ -76,6 +77,9 @@ function Pets() {
         <Button variant="warning" onClick={() => setShowAddPetModal(true)}>
           Add New Pet for Adoption
         </Button>
+        <br />
+        <div className="mt-3"><Link to={'/profile'} style={{ color: 'black', textDecoration: 'none' }} className='bg-info rounded p-2'>Check Your Pet Adoption Status</Link></div>
+
       </div>
 
       {/* Adopt Modal */}
@@ -103,12 +107,13 @@ function Pets() {
                 Your support helps cover food, vaccinations, and rescue operations. ❤️
               </Form.Text>
             </Form.Group>
-
-            <Button variant="primary" className="mt-4" onClick={() => setShowAdoptModal(false)}>
-              Submit Adoption Request
-            </Button>
           </Form>
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" className="mt-4" onClick={() => setShowAdoptModal(false)}>
+            Submit Adoption Request
+          </Button>
+        </Modal.Footer>
       </Modal>
 
 
@@ -173,12 +178,13 @@ function Pets() {
                 </>
               )}
             </Form.Group>
-
-            <Button variant="success" className="mt-3" onClick={handleAddNewPet}>
-              Add Pet
-            </Button>
           </Form>
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="warning" className="mt-3" onClick={handleAddNewPet}>
+            Add Pet
+          </Button>
+        </Modal.Footer>
       </Modal>
 
     </Container>

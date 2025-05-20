@@ -18,14 +18,26 @@ export const addUserPetApi = async (data, reqHeader) => {
     return await commonApi('POST', `${base_url}/user/pets`, data, reqHeader)
 }
 //get userPets
-export const getUserPetApi=async(reqHeader)=>{
-    return await commonApi('GET',`${base_url}/user/pets`,"",reqHeader)
+export const getUserPetApi = async (reqHeader) => {
+    return await commonApi('GET', `${base_url}/user/pets`, "", reqHeader)
 }
 //update userPets
-export const editUserPetApi=async(id,reqBody,reqHeader)=>{
-    return await commonApi('PUT',`${base_url}/user/pets/${id}`,reqBody,reqHeader)
+export const editUserPetApi = async (id, reqBody, reqHeader) => {
+    return await commonApi('PUT', `${base_url}/user/pets/${id}`, reqBody, reqHeader)
+}
+// delete userPets
+export const deleteUserPetApi = async (id, reqHeader) => {
+    return await commonApi('DELETE', `${base_url}/user/pets/${id}`, {}, reqHeader)
 }
 // add lostPets
 export const addLostPetApi = async (data, reqHeader) => {
     return await commonApi('POST', `${base_url}/lost/pets`, data, reqHeader)
 }
+//get lostPets
+export const getLostPetApi = async (reqHeader) => {
+    return await commonApi('GET', `${base_url}/lost/pets`, "", reqHeader)
+}
+// update location of lostPets
+export const updateLostPetLocationApi = async (petId, location, headers) => {
+  return await commonApi("PUT", `${base_url}/lostpets/${petId}/location`, { location }, headers);
+};

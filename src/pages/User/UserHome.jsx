@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./userhome.css"; // Import CSS for popup animation
 import { Modal, Button, Form } from 'react-bootstrap'
 import { toast, ToastContainer } from "react-toastify";
-import { addUserPetApi, getUserPetApi, editUserPetApi } from "../../services/allApi";
+import { addUserPetApi, getUserPetApi, editUserPetApi, deleteUserPetApi } from "../../services/allApi";
 import { base_url } from "../../services/base_url";
 
 function UserHome() {
@@ -165,6 +165,23 @@ function UserHome() {
       console.error(error);
     }
   };
+  const handleDelete = async (Id) => {
+    const token = sessionStorage.getItem("token")
+    const reqHeader = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    }
+    const result = await deleteUserPetApi(Id, reqHeader)
+    if (result.status === 200) {
+      console.log("Delete Status:", result)
+      toast.success(`${result.data.name} deleted successfully!`)
+      getUserPet()
+
+    }
+    else {
+      toast.error("Something Happened! Cannnot Delete!")
+    }
+  }
 
   return (
     <div className="container py-5 text-center position-relative">
@@ -213,8 +230,9 @@ function UserHome() {
                     </p>
                   </div>
                   <div className="card-footer bg-transparent border-0 text-center">
+
                     <button
-                      className="btn btn-outline-primary btn-sm"
+                      className="btn btn-outline-success btn-sm"
                       onClick={() => {
                         setShow(true)
                         setEditPetDetails({
@@ -225,13 +243,13 @@ function UserHome() {
                           health: pet.health,
                           nextVetAppointment: pet.nextVetAppointment,
                           vaccinations: pet.vaccinations,
-                          userPetImage: pet.userPetImage ?`${base_url}/uploads/${pet.userPetImage}`: pet.userPetImage ,
+                          userPetImage: pet.userPetImage ? `${base_url}/uploads/${pet.userPetImage}` : pet.userPetImage,
                         });
                       }}
                     >
                       Edit Details
                     </button>
-
+                    <button className="btn btn-outline-danger btn-sm ms-2" onClick={() => handleDelete(pet._id)}>Delete</button>
                   </div>
                 </div>
               </div>
@@ -343,7 +361,7 @@ function UserHome() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={addPet}>
+          <Button variant="warning" onClick={addPet}>
             Add Pet
           </Button>
         </Modal.Footer>
@@ -409,7 +427,7 @@ function UserHome() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleEditUserPet}>
+          <Button variant="warning" onClick={handleEditUserPet}>
             Save Changes
           </Button>
         </Modal.Footer>

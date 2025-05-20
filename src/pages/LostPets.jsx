@@ -1,56 +1,118 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button, Container, Row, Col, Modal, Form } from 'react-bootstrap';
 import '../App.css';
-import goldenRetriever from '../assets/golden-retriever.jpg';
-import tabbyCat from '../assets/tabby-cat.jpg';
-import beagleDog from '../assets/beagle.jpg';
-import persianCat from '../assets/persian-cat.jpg';
-
-// Sample Pet Data (Replace with API later)
-const initialPetData = [
-    { id: 1, name: 'Buddy', type: 'Dog', image: goldenRetriever, description: 'A friendly golden retriever.', lastFoundLocation: 'Park Avenue', owner: 'John Doe' },
-    { id: 2, name: 'Whiskers', type: 'Cat', image: tabbyCat, description: 'A curious and playful tabby cat.', lastFoundLocation: 'Greenwood Street', owner: 'Jane Smith' },
-    { id: 3, name: 'Charlie', type: 'Dog', image: beagleDog, description: 'A lovable beagle who loves belly rubs.', lastFoundLocation: 'Sunset Boulevard', owner: 'Mike Johnson' },
-    { id: 4, name: 'Luna', type: 'Cat', image: persianCat, description: 'A sleepy but adorable Persian cat.', lastFoundLocation: 'Maple Drive', owner: 'Emily Davis' },
-];
+import { addLostPetApi, getLostPetApi, updateLostPetLocationApi } from '../services/allApi';
+import { toast } from 'react-toastify';
+import { base_url } from '../services/base_url';
+import { Link } from 'react-router-dom';
 
 function LostPets() {
     const [selectedFilter, setSelectedFilter] = useState('All');
-    const [pets, setPets] = useState(initialPetData);
     const [showFoundModal, setShowFoundModal] = useState(false);
     const [showLostModal, setShowLostModal] = useState(false);
     const [selectedPetId, setSelectedPetId] = useState(null);
     const [foundLocation, setFoundLocation] = useState('');
-    const [newLostPet, setNewLostPet] = useState({ name: '', type: '', description: '', owner: '', lastFoundLocation: '', image: '' });
+    const [newLostPet, setNewLostPet] = useState({
+        name: '',
+        type: '',
+        description: '',
+        owner: '',
+        location: '',
+        lostPetImage: ''
+    });
     const [imagePreview, setImagePreview] = useState(null);
-
+    const [pets, setPets] = useState([]); // ✅ FIXED: should be an array
 
     const handleFoundClick = (petId) => {
         setSelectedPetId(petId);
         setShowFoundModal(true);
     };
 
-    const handleFoundSubmit = () => {
-        const updatedPets = pets.map(pet =>
-            pet.id === selectedPetId ? { ...pet, lastFoundLocation: foundLocation } : pet
-        );
-        setPets(updatedPets);
-        setFoundLocation('');
-        setShowFoundModal(false);
-    };
+    const handleFoundSubmit = async () => {
+        if (!foundLocation) {
+            toast.warning("Please enter the location.");
+            return;
+        }
 
-    const handleReportLostPet = () => {
-        const newPet = {
-            ...newLostPet,
-            id: pets.length + 1,
-            image: goldenRetriever // You can allow file upload later; using a placeholder for now
+        const token = sessionStorage.getItem("token");
+        const reqHeader = {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
         };
-        setPets([...pets, newPet]);
-        setNewLostPet({ name: '', type: '', description: '', owner: '', lastFoundLocation: '', image: '' });
-        setShowLostModal(false);
+
+        try {
+            const result = await updateLostPetLocationApi(selectedPetId, foundLocation, reqHeader);
+            toast.success("Location updated successfully!", result);
+
+            // Refresh list to reflect changes
+            getLostPet();
+            setFoundLocation('');
+            setShowFoundModal(false);
+        } catch (error) {
+            toast.error("Failed to update location.");
+            console.error(error);
+        }
     };
 
-    // Filter Pets
+
+    const handleReportLostPet = async () => {
+        const { name, type, description, owner, location, lostPetImage } = newLostPet;
+        if (!name || !type || !description || !owner || !location || !lostPetImage) {
+            toast.warning("Please fill out all fields before submitting.");
+            return;
+        }
+
+        const reqBody = new FormData();
+        reqBody.append("name", name);
+        reqBody.append("type", type);
+        reqBody.append("description", description);
+        reqBody.append("owner", owner);
+        reqBody.append("location", location);
+        reqBody.append("lostPetImage", lostPetImage);
+
+        const token = sessionStorage.getItem("token");
+        const reqHeader = {
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}`
+        };
+
+        try {
+            const result = await addLostPetApi(reqBody, reqHeader);
+            console.log("Lost Pet Reported:", result);
+            toast.success("Lost pet reported successfully!");
+            getLostPet();
+            setNewLostPet({
+                name: '', type: '', description: '', owner: '', location: '', lostPetImage: ''
+            });
+            setImagePreview(null);
+            setShowLostModal(false);
+        } catch (error) {
+            toast.error("Something went wrong while reporting the lost pet.");
+            console.error("Error:", error);
+        }
+    };
+
+    const getLostPet = async () => {
+        const token = sessionStorage.getItem("token");
+        const requestHeader = {
+            "Content-Type": 'application/json',
+            "Authorization": `Bearer ${token}`
+        };
+
+        try {
+            const result = await getLostPetApi(requestHeader);
+            console.log("Lost Pets:", result.data);
+            setPets(result.data); // ✅ FIXED: was setting newLostPet instead
+        } catch (error) {
+            console.error("Failed to fetch lost pets:", error);
+        }
+    };
+
+    useEffect(() => {
+        getLostPet();
+    }, []);
+
+    // Filtered pets
     const filteredPets = selectedFilter === 'All'
         ? pets
         : pets.filter(pet => pet.type === selectedFilter);
@@ -67,26 +129,28 @@ function LostPets() {
             </div>
 
             {/* Pets List */}
-            <Row>
-                {filteredPets.map((pet) => (
-                    <Col key={pet.id} xs={12} sm={6} md={4} lg={3} className="mb-4">
+            <Row className='justify-content-center'>
+                {filteredPets.length > 0 ? filteredPets.map((pet) => (
+                    <Col key={pet._id} xs={12} sm={6} md={4} lg={3} className="mb-4">
                         <Card className="shadow-sm">
-                            <Card.Img variant="top" src={pet.image} className="pet-card-image" style={{ position: 'relative' }} />
+                            <Card.Img variant="top" src={`${base_url}/uploads/${pet.lostPetImage}`} className="pet-card-image" />
                             <Card.Body className="text-center">
                                 <Card.Title>{pet.name}</Card.Title>
-                                <Card.Text>{pet.description.slice(0, 28)}...</Card.Text>
-                                <Card.Text><strong>Last Seen:</strong> {pet.lastFoundLocation}</Card.Text>
+                                <Card.Text>{pet.description?.slice(0, 28)}...</Card.Text>
+                                <Card.Text><strong>Last Seen:</strong> {pet.location}</Card.Text>
                                 <Card.Text><strong>Owner:</strong> {pet.owner}</Card.Text>
-                                <Button variant="info" onClick={() => handleFoundClick(pet.id)}>Report Found</Button>
+                                <Button variant="info" onClick={() => handleFoundClick(pet._id)}>Report Found</Button>
                             </Card.Body>
                         </Card>
                     </Col>
-                ))}
+                )) : <p className="text-center w-100">No pets to display.</p>}
             </Row>
 
             {/* Report Lost Pet Button */}
             <div className="text-center mt-4 mb-4">
                 <Button variant="warning" onClick={() => setShowLostModal(true)}>Report Lost Pet</Button>
+                <div className="mt-3"><Link to={'/profile'} style={{ color: 'black', textDecoration: 'none' }} className='bg-info rounded p-2'>Check Your Lost Pet Status</Link></div>
+
             </div>
 
             {/* Found Modal */}
@@ -109,11 +173,11 @@ function LostPets() {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowFoundModal(false)}>Cancel</Button>
-                    <Button variant="primary" onClick={handleFoundSubmit}>Submit</Button>
+                    <Button variant="warning" onClick={handleFoundSubmit}>Submit</Button>
                 </Modal.Footer>
             </Modal>
 
-            {/* Report Lost Modal */}
+            {/* Lost Pet Modal */}
             <Modal show={showLostModal} onHide={() => setShowLostModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Report Lost Pet</Modal.Title>
@@ -163,7 +227,7 @@ function LostPets() {
                                 type="text"
                                 placeholder="Enter last known location"
                                 value={newLostPet.lastFoundLocation}
-                                onChange={(e) => setNewLostPet({ ...newLostPet, lastFoundLocation: e.target.value })}
+                                onChange={(e) => setNewLostPet({ ...newLostPet, location: e.target.value })}
                             />
                         </Form.Group>
                         <Form.Group controlId="petImage" className="mt-2">
@@ -173,36 +237,25 @@ function LostPets() {
                                 accept="image/*"
                                 onChange={(e) => {
                                     const file = e.target.files[0];
-                                    setNewLostPet({ ...newLostPet, image: file });
-                                    if (file) {
-                                        setImagePreview(URL.createObjectURL(file));
-                                    } else {
-                                        setImagePreview(null);
-                                    }
+                                    setNewLostPet({ ...newLostPet, lostPetImage: file });
+                                    setImagePreview(file ? URL.createObjectURL(file) : null);
                                 }}
                             />
-                            {newLostPet.image && (
-                                <>
-                                    <Form.Text className="text-muted">
-                                        Selected file: {newLostPet.image.name}
-                                    </Form.Text>
-                                    <div className="mt-2">
-                                        <img
-                                            src={imagePreview}
-                                            alt="Preview"
-                                            style={{ maxWidth: '100%', height: '150px', objectFit: 'cover', borderRadius: '8px' }}
-                                        />
-                                    </div>
-                                </>
+                            {imagePreview && (
+                                <div className="mt-2">
+                                    <img
+                                        src={imagePreview}
+                                        alt="Preview"
+                                        style={{ maxWidth: '100%', height: '150px', objectFit: 'cover', borderRadius: '8px' }}
+                                    />
+                                </div>
                             )}
                         </Form.Group>
-
-
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowLostModal(false)}>Cancel</Button>
-                    <Button variant="primary" onClick={handleReportLostPet}>Submit</Button>
+                    <Button variant="warning" onClick={handleReportLostPet}>Submit</Button>
                 </Modal.Footer>
             </Modal>
         </Container>
