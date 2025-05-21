@@ -39,5 +39,12 @@ export const getLostPetApi = async (reqHeader) => {
 }
 // update location of lostPets
 export const updateLostPetLocationApi = async (petId, location, headers) => {
-  return await commonApi("PUT", `${base_url}/lostpets/${petId}/location`, { location }, headers);
+    return await commonApi("PUT", `${base_url}/lostpets/${petId}/location`, { location }, headers);
 };
+// add adopt pet listing
+export const addAdoptPetDetailsApi = async (data, reqHeader) => {
+    return await commonApi('POST', `${base_url}/adopt/pets`, data, reqHeader)
+}
+export const getAdoptPetApi = async (reqHeader) => {
+    return await commonApi('GET', `${base_url}/adopt/pets`,"", reqHeader)
+}

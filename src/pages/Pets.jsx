@@ -1,33 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button, Container, Row, Col, Modal, Form } from 'react-bootstrap';
 import '../App.css';
-import goldenRetriever from '../assets/golden-retriever.jpg';
-import tabbyCat from '../assets/tabby-cat.jpg';
-import beagleDog from '../assets/beagle.jpg';
-import persianCat from '../assets/persian-cat.jpg';
-import { Link } from 'react-router-dom';
-
-// Sample Pet Data (Replace with API later)
-const initialPetData = [
-  { id: 1, name: 'Buddy', type: 'Dog', image: goldenRetriever, description: 'A friendly golden retriever.', owner: 'John Doe', lastLocation: 'Central Park' },
-  { id: 2, name: 'Whiskers', type: 'Cat', image: tabbyCat, description: 'A curious and playful tabby cat.', owner: 'Jane Smith', lastLocation: 'Maple Street' },
-  { id: 3, name: 'Charlie', type: 'Dog', image: beagleDog, description: 'A lovable beagle who loves belly rubs.', owner: 'Emily Johnson', lastLocation: 'River Side' },
-  { id: 4, name: 'Luna', type: 'Cat', image: persianCat, description: 'A sleepy but adorable Persian cat.', owner: 'Michael Brown', lastLocation: 'Oak Avenue' },
-];
+import { Link, useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import { addAdoptPetDetailsApi, getAdoptPetApi } from '../services/allApi';
+import { base_url } from '../services/base_url';
 
 function Pets() {
-  const [petData, setPetData] = useState(initialPetData);
+  const [petData, setPetData] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [showAdoptModal, setShowAdoptModal] = useState(false);
   const [showAddPetModal, setShowAddPetModal] = useState(false);
   const [selectedPet, setSelectedPet] = useState(null);
   const [newPet, setNewPet] = useState({ name: '', type: '', description: '', owner: '', lastLocation: '', image: null });
   const [imagePreview, setImagePreview] = useState(null);
+  const navigate = useNavigate();
 
   // Filter Pets
   const filteredPets = selectedFilter === 'All'
-    ? petData
-    : petData.filter(pet => pet.type === selectedFilter);
+    ? (petData || [])
+    : (petData || []).filter(pet => pet.type === selectedFilter);
 
   // Handle adopt button click
   const handleAdoptClick = (pet) => {
@@ -36,12 +28,73 @@ function Pets() {
   };
 
   // Handle Add New Pet
-  const handleAddNewPet = () => {
-    const newPetWithId = { ...newPet, id: petData.length + 1 };
-    setPetData([...petData, newPetWithId]);
-    //setNewPet({ name: '', type: '', description: '', owner: '', lastLocation: '', image: '' });
-    setShowAddPetModal(false);
+  const handleAddNewPet = async () => {
+    const { name, type, description, owner, lastLocation, image } = newPet;
+    if (!name || !type || !description || !owner || !lastLocation || !image) {
+      toast.warning("Please fill the form completely!");
+      return;
+    }
+
+    const reqBody = new FormData();
+    reqBody.append("name", name);
+    reqBody.append("type", type);
+    reqBody.append("description", description);
+    reqBody.append("owner", owner);
+    reqBody.append("lastLocation", lastLocation);
+    reqBody.append("image", image);
+
+    const token = sessionStorage.getItem("token");
+    const reqHeader = {
+      "Content-Type": "multipart/form-data",
+      "Authorization": `Bearer ${token}`
+    };
+
+    try {
+      const result = await addAdoptPetDetailsApi(reqBody, reqHeader);
+      console.log("Pets to be adopted:", result);
+      setNewPet({ name: '', type: '', description: '', owner: '', lastLocation: '', image: null });
+      setImagePreview(null);
+      setShowAddPetModal(false);
+      getAdoptPetListing();
+      toast.success(`${name} added successfully!`);
+    } catch (err) {
+      toast.error("Something went wrong while adding the pet.");
+      console.log("Error:", err);
+    }
   };
+
+  const getAdoptPetListing = async () => {
+    const token = sessionStorage.getItem("token");
+    const requestHeader = {
+      "Content-Type": 'application/json',
+      "Authorization": `Bearer ${token}`
+    };
+
+    try {
+      const result = await getAdoptPetApi(requestHeader);
+      if (result.status === 200) {
+        setPetData(result.data);
+      }
+    } catch (error) {
+      if (error.response?.status === 401) {
+        toast.error("Unauthorized. Please log in again.");
+        navigate('/login'); // Redirect to login page
+      } else {
+        toast.error("Failed to fetch pets.");
+      }
+      console.error("API Error:", error);
+    }
+  };
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      getAdoptPetListing();
+    } else {
+      toast.error("Unauthorized access. Please log in.");
+      navigate('/login'); // redirect to login if token missing
+    }
+  }, []);
 
   return (
     <Container className="mt-4">
@@ -55,21 +108,21 @@ function Pets() {
       </div>
 
       {/* Pets List */}
-      <Row>
-        {filteredPets.map((pet) => (
-          <Col key={pet.id} xs={12} sm={6} md={4} lg={3} className="mb-4">
+      <Row className='justify-content-center'>
+        {filteredPets.length > 0 ? filteredPets.map((pet) => (
+          <Col key={pet._id} xs={12} sm={6} md={4} lg={3} className="mb-4">
             <Card className="shadow-sm">
-              <Card.Img variant="top" src={pet.image} className="pet-card-image" style={{ position: 'relative' }} />
+              <Card.Img variant="top" src={`${base_url}/uploads/${pet.image}`} className="pet-card-image" />
               <Card.Body className="text-center">
                 <Card.Title>{pet.name}</Card.Title>
-                <Card.Text>{pet.description.slice(0, 28)}...</Card.Text>
+                <Card.Text>{pet.description?.slice(0, 28)}...</Card.Text>
                 <Card.Text><strong>Owner:</strong> {pet.owner}</Card.Text>
                 <Card.Text><strong>Location:</strong> {pet.lastLocation}</Card.Text>
                 <Button variant="info" onClick={() => handleAdoptClick(pet)}>Adopt</Button>
               </Card.Body>
             </Card>
           </Col>
-        ))}
+        )) : <p className="text-center w-100">No pets to display.</p>}
       </Row>
 
       {/* Add New Pet Button */}
@@ -78,8 +131,11 @@ function Pets() {
           Add New Pet for Adoption
         </Button>
         <br />
-        <div className="mt-3"><Link to={'/profile'} style={{ color: 'black', textDecoration: 'none' }} className='bg-info rounded p-2'>Check Your Pet Adoption Status</Link></div>
-
+        <div className="mt-3">
+          <Link to={'/profile'} style={{ color: 'black', textDecoration: 'none' }} className='bg-info rounded p-2'>
+            Check Your Pet Adoption Status
+          </Link>
+        </div>
       </div>
 
       {/* Adopt Modal */}
@@ -93,13 +149,10 @@ function Pets() {
               <Form.Label>Your Name</Form.Label>
               <Form.Control type="text" placeholder="Enter your name" />
             </Form.Group>
-
             <Form.Group controlId="formContact" className="mt-3">
               <Form.Label>Contact Info</Form.Label>
               <Form.Control type="text" placeholder="Enter your contact details" />
             </Form.Group>
-
-            {/* Optional Donation Field */}
             <Form.Group controlId="formDonation" className="mt-4">
               <Form.Label>Support Our Rescue Efforts</Form.Label>
               <Form.Control type="number" placeholder="Enter donation amount (₹)" min="100" />
@@ -110,14 +163,13 @@ function Pets() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="warning" className="mt-4" onClick={() => setShowAdoptModal(false)}>
+          <Button variant="warning" onClick={() => setShowAdoptModal(false)}>
             Submit Adoption Request
           </Button>
         </Modal.Footer>
       </Modal>
 
-
-      {/* Add New Pet Modal */}
+      {/* Add Pet Modal */}
       <Modal show={showAddPetModal} onHide={() => setShowAddPetModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Add New Pet for Adoption</Modal.Title>
@@ -130,10 +182,12 @@ function Pets() {
             </Form.Group>
             <Form.Group controlId="formPetType" className="mt-3">
               <Form.Label>Pet Type</Form.Label>
-              <Form.Control as="select" value={newPet.type} onChange={(e) => setNewPet({ ...newPet, type: e.target.value })}>
-                <option>Dog</option>
-                <option>Cat</option>
-              </Form.Control>
+              <Form.Control
+                type="text"
+                placeholder="Enter pet type (e.g., Dog or Cat)"
+                value={newPet.type}
+                onChange={(e) => setNewPet({ ...newPet, type: e.target.value })}
+              />
             </Form.Group>
             <Form.Group controlId="formDescription" className="mt-3">
               <Form.Label>Description</Form.Label>
@@ -147,46 +201,37 @@ function Pets() {
               <Form.Label>Location</Form.Label>
               <Form.Control type="text" placeholder="Current Location of the pet" value={newPet.lastLocation} onChange={(e) => setNewPet({ ...newPet, lastLocation: e.target.value })} />
             </Form.Group>
-            <Form.Group controlId="formLocation" className="mt-3">
+            <Form.Group controlId="formImage" className="mt-3">
               <Form.Label>Image</Form.Label>
               <Form.Control
                 type="file"
                 accept="image/*"
-                placeholder="Image of the Pet"
                 onChange={(e) => {
                   const file = e.target.files[0];
                   setNewPet({ ...newPet, image: file });
-                  if (file) {
-                    setImagePreview(URL.createObjectURL(file));
-                  } else {
-                    setImagePreview(null);
-                  }
+                  setImagePreview(file ? URL.createObjectURL(file) : null);
                 }}
               />
-              {newPet.image && (
-                <>
-                  <Form.Text className="text-muted">
-                    Selected file: {newPet.image.name}
-                  </Form.Text>
-                  <div className="mt-2">
-                    <img
-                      src={imagePreview}
-                      alt="Pet Preview"
-                      style={{ maxWidth: '100%', height: '150px', objectFit: 'cover', borderRadius: '8px' }}
-                    />
-                  </div>
-                </>
+              {imagePreview && (
+                <div className="mt-2">
+                  <img
+                    src={imagePreview}
+                    alt="Pet Preview"
+                    style={{ maxWidth: '100%', height: '150px', objectFit: 'cover', borderRadius: '8px' }}
+                  />
+                </div>
               )}
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="warning" className="mt-3" onClick={handleAddNewPet}>
+          <Button variant="warning" onClick={handleAddNewPet}>
             Add Pet
           </Button>
         </Modal.Footer>
       </Modal>
 
+      <ToastContainer />
     </Container>
   );
 }

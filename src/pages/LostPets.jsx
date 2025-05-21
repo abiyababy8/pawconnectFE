@@ -102,7 +102,7 @@ function LostPets() {
         try {
             const result = await getLostPetApi(requestHeader);
             console.log("Lost Pets:", result.data);
-            setPets(result.data); // ✅ FIXED: was setting newLostPet instead
+            setPets(result.data); 
         } catch (error) {
             console.error("Failed to fetch lost pets:", error);
         }
