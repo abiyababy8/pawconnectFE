@@ -3,7 +3,7 @@ import { Card, Button, Container, Row, Col, Modal, Form } from 'react-bootstrap'
 import '../App.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-import { addAdoptPetDetailsApi, getAdoptPetApi } from '../services/allApi';
+import { addAdoptPetDetailsApi, addAdoptRequestApi, getAdoptPetApi } from '../services/allApi';
 import { base_url } from '../services/base_url';
 
 function Pets() {
@@ -14,6 +14,12 @@ function Pets() {
   const [selectedPet, setSelectedPet] = useState(null);
   const [newPet, setNewPet] = useState({ name: '', type: '', description: '', owner: '', lastLocation: '', image: null });
   const [imagePreview, setImagePreview] = useState(null);
+  const [requestDetails, setRequestDetails] = useState({
+    name: "",
+    contact: "",
+    donation: "",
+    pet: ""
+  })
   const navigate = useNavigate();
 
   // Filter Pets
@@ -96,6 +102,54 @@ function Pets() {
     }
   }, []);
 
+  const handleAddAdoptionRequest = async () => {
+    const { name, contact, donation, pet } = requestDetails
+
+    if (!name || !contact || !donation) {
+      toast.warning("Please fill the form completely!")
+    }
+    else {
+      const reqBody = {
+        name,
+        contact,
+        donation,
+        pet: pet
+      };
+      const token = sessionStorage.getItem("token");
+      const reqHeader = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      };
+
+      try {
+        const result = await addAdoptRequestApi(reqBody, reqHeader)
+        if (result.status === 201) {
+          console.log(result.data)
+          toast.success(result.data)
+          setRequestDetails({
+            name: "",
+            contact: "",
+            donation: "",
+            pet: ""
+          })
+          setShowAdoptModal(false)
+        }
+        else if (result.status === 406) {
+          toast.warning("You have already Submitted request for this pet")
+          setRequestDetails({
+            name: "",
+            contact: "",
+            donation: "",
+            pet: ""
+          })
+          setShowAdoptModal(false)
+        }
+      }
+      catch (err) {
+        console.log(err)
+      }
+    }
+  }
   return (
     <Container className="mt-4">
       <h1 className="text-center">Available Pets for Adoption 🐾</h1>
@@ -145,17 +199,25 @@ function Pets() {
         </Modal.Header>
         <Modal.Body>
           <Form>
+            <Form.Group controlId="formPetName">
+              <Form.Label>Pet Name</Form.Label>
+              <Form.Control
+                type="text"
+                value={selectedPet?.name}
+                disabled
+              />
+            </Form.Group>
             <Form.Group controlId="formName">
               <Form.Label>Your Name</Form.Label>
-              <Form.Control type="text" placeholder="Enter your name" />
+              <Form.Control type="text" placeholder="Enter your name" onChange={(e) => setRequestDetails({ ...requestDetails, name: e.target.value })} />
             </Form.Group>
             <Form.Group controlId="formContact" className="mt-3">
               <Form.Label>Contact Info</Form.Label>
-              <Form.Control type="text" placeholder="Enter your contact details" />
+              <Form.Control type="text" placeholder="Enter your contact details" onChange={(e) => setRequestDetails({ ...requestDetails, contact: e.target.value })} />
             </Form.Group>
             <Form.Group controlId="formDonation" className="mt-4">
               <Form.Label>Support Our Rescue Efforts</Form.Label>
-              <Form.Control type="number" placeholder="Enter donation amount (₹)" min="100" />
+              <Form.Control type="number" placeholder="Enter donation amount (₹)" min="100" onChange={(e) => setRequestDetails({ ...requestDetails, donation: e.target.value })} />
               <Form.Text className="text-muted">
                 Your support helps cover food, vaccinations, and rescue operations. ❤️
               </Form.Text>
@@ -163,7 +225,7 @@ function Pets() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="warning" onClick={() => setShowAdoptModal(false)}>
+          <Button variant="warning" onClick={handleAddAdoptionRequest}>
             Submit Adoption Request
           </Button>
         </Modal.Footer>
