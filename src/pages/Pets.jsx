@@ -11,14 +11,15 @@ function Pets() {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [showAdoptModal, setShowAdoptModal] = useState(false);
   const [showAddPetModal, setShowAddPetModal] = useState(false);
-  const [selectedPet, setSelectedPet] = useState(null);
-  const [newPet, setNewPet] = useState({ name: '', type: '', description: '', owner: '', lastLocation: '', image: null });
+  const [selectedPet, setSelectedPet] = useState("");
+  const [newPet, setNewPet] = useState({ name: '', type: '', description: '', owner: '', lastLocation: '', image: null, status: 'Pending' });
   const [imagePreview, setImagePreview] = useState(null);
   const [requestDetails, setRequestDetails] = useState({
     name: "",
     contact: "",
     donation: "",
-    pet: ""
+    pet: "",
+    status:'Request submitted'
   })
   const navigate = useNavigate();
 
@@ -35,7 +36,7 @@ function Pets() {
 
   // Handle Add New Pet
   const handleAddNewPet = async () => {
-    const { name, type, description, owner, lastLocation, image } = newPet;
+    const { name, type, description, owner, lastLocation, image, status } = newPet;
     if (!name || !type || !description || !owner || !lastLocation || !image) {
       toast.warning("Please fill the form completely!");
       return;
@@ -48,6 +49,7 @@ function Pets() {
     reqBody.append("owner", owner);
     reqBody.append("lastLocation", lastLocation);
     reqBody.append("image", image);
+    reqBody.append("status", status);
 
     const token = sessionStorage.getItem("token");
     const reqHeader = {
@@ -58,7 +60,7 @@ function Pets() {
     try {
       const result = await addAdoptPetDetailsApi(reqBody, reqHeader);
       console.log("Pets to be adopted:", result);
-      setNewPet({ name: '', type: '', description: '', owner: '', lastLocation: '', image: null });
+      setNewPet({ name: '', type: '', description: '', owner: '', lastLocation: '', image: null, status: 'pending' });
       setImagePreview(null);
       setShowAddPetModal(false);
       getAdoptPetListing();
@@ -103,7 +105,7 @@ function Pets() {
   }, []);
 
   const handleAddAdoptionRequest = async () => {
-    const { name, contact, donation, pet } = requestDetails
+    const { name, contact, donation,status } = requestDetails
 
     if (!name || !contact || !donation) {
       toast.warning("Please fill the form completely!")
@@ -113,7 +115,8 @@ function Pets() {
         name,
         contact,
         donation,
-        pet: pet
+        pet: selectedPet._id,  // send just the pet ID here
+        status
       };
       const token = sessionStorage.getItem("token");
       const reqHeader = {
@@ -130,7 +133,8 @@ function Pets() {
             name: "",
             contact: "",
             donation: "",
-            pet: ""
+            pet: "",
+            status:"Request submitted"
           })
           setShowAdoptModal(false)
         }
@@ -140,7 +144,8 @@ function Pets() {
             name: "",
             contact: "",
             donation: "",
-            pet: ""
+            pet: "",
+            status:"Request submitted"
           })
           setShowAdoptModal(false)
         }
@@ -150,6 +155,7 @@ function Pets() {
       }
     }
   }
+
   return (
     <Container className="mt-4">
       <h1 className="text-center">Available Pets for Adoption 🐾</h1>

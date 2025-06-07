@@ -13,6 +13,10 @@ export const loginApi = async (data) => {
 export const getUserDetailsApi = async (reqHeader) => {
     return await commonApi("GET", `${base_url}/user/userDetails`, "", reqHeader)
 }
+//edit userDetails
+export const editUserApi = async (id, reqBody, reqHeader) => {
+    return await commonApi('PUT', `${base_url}/user/edit/${id}`, reqBody, reqHeader)
+}
 //add userPets
 export const addUserPetApi = async (data, reqHeader) => {
     return await commonApi('POST', `${base_url}/user/pets`, data, reqHeader)
@@ -41,15 +45,27 @@ export const getLostPetApi = async (reqHeader) => {
 export const updateLostPetLocationApi = async (petId, location, headers) => {
     return await commonApi("PUT", `${base_url}/lostpets/${petId}/location`, { location }, headers);
 };
+// get my lost pets
+export const getUserLostPetApi = async (reqHeader) => {
+    return await commonApi('GET', `${base_url}/user-lost/pets`, "", reqHeader)
+}
 // add adopt pet listing
 export const addAdoptPetDetailsApi = async (data, reqHeader) => {
     return await commonApi('POST', `${base_url}/adopt/pets`, data, reqHeader)
 }
 // get adopt pet listing
 export const getAdoptPetApi = async (reqHeader) => {
-    return await commonApi('GET', `${base_url}/adopt/pets`,"", reqHeader)
+    return await commonApi('GET', `${base_url}/adopt/pets`, "", reqHeader)
+}
+// get my adoption listing
+export const getUserAdoptListApi = async (reqHeader) => {
+    return await commonApi('GET', `${base_url}/user-adopt/petlist`, "", reqHeader)
 }
 // add adoption request
-export const addAdoptRequestApi=async(data,reqHeader)=>{
-    return await commonApi('POST',`${base_url}/adopt/request`,data,reqHeader)
+export const addAdoptRequestApi = async (data, reqHeader) => {
+    return await commonApi('POST', `${base_url}/adopt/request`, data, reqHeader)
+}
+// get my adoption requests
+export const getUserAdoptRequestApi = async (reqHeader) => {
+    return await commonApi('GET', `${base_url}/user-adopt/request`, "", reqHeader)
 }

@@ -18,7 +18,8 @@ function LostPets() {
         description: '',
         owner: '',
         location: '',
-        lostPetImage: ''
+        lostPetImage: '',
+        status: 'Not Found'
     });
     const [imagePreview, setImagePreview] = useState(null);
     const [pets, setPets] = useState([]); // ✅ FIXED: should be an array
@@ -56,7 +57,7 @@ function LostPets() {
 
 
     const handleReportLostPet = async () => {
-        const { name, type, description, owner, location, lostPetImage } = newLostPet;
+        const { name, type, description, owner, location, lostPetImage, status } = newLostPet;
         if (!name || !type || !description || !owner || !location || !lostPetImage) {
             toast.warning("Please fill out all fields before submitting.");
             return;
@@ -69,6 +70,7 @@ function LostPets() {
         reqBody.append("owner", owner);
         reqBody.append("location", location);
         reqBody.append("lostPetImage", lostPetImage);
+        reqBody.append("status", status);
 
         const token = sessionStorage.getItem("token");
         const reqHeader = {
@@ -102,7 +104,7 @@ function LostPets() {
         try {
             const result = await getLostPetApi(requestHeader);
             console.log("Lost Pets:", result.data);
-            setPets(result.data); 
+            setPets(result.data);
         } catch (error) {
             console.error("Failed to fetch lost pets:", error);
         }
