@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { registerApi } from '../../services/allApi';
 import { toast, ToastContainer } from 'react-toastify';
 
@@ -184,7 +184,7 @@ function Register() {
                             </Col>
                         </Form.Group>
 
-                        <p className="text-center">Already registered? <a href="/login">Login here</a></p>
+                        <p className="text-center">Already registered? <Link to="/login">Login here</Link></p>
 
                         <Form.Group as={Row} className="mb-3">
                             <Col className="d-flex justify-content-end">
