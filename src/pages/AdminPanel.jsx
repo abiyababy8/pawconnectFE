@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Form, Container, Row, Col, Modal } from "react-bootstrap";
 import "../App.css";
-import { getAllUserDetailsApi, getUserDetailsApi } from "../services/allApi";
+import { getAllPetDetailsApi, getAllUserDetailsApi, getUserDetailsApi } from "../services/allApi";
 
 function AdminPanel() {
     const [selectedSection, setSelectedSection] = useState("users");
@@ -28,14 +28,32 @@ function AdminPanel() {
             }
             const result = await getAllUserDetailsApi(reqHeader)
             console.log(result.data)
-            setUsers(result.data)
+            const filteredUsers = result.data.filter(
+                user => user.username !== 'admin' && user.username !== 'shelter'
+            )
+            setUsers(filteredUsers)
         } catch (error) {
             console.log("Something Happened", error)
         }
     }
-    useEffect(()=>{
+    const getPets = async () => {
+        try {
+            const token = sessionStorage.getItem("token")
+            const reqHeader = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+            const result = await getAllPetDetailsApi(reqHeader)
+            console.log(result.data)
+            setPets(result.data)
+        } catch (error) {
+            console.log("Something Happened", error)
+        }
+    }
+    useEffect(() => {
         getUsers()
-    },[])
+        getPets()
+    }, [])
     // User handlers
     const handleAddUser = () => {
         setEditUser({ id: users.length + 1, username: "", email: "" });
@@ -157,22 +175,24 @@ function AdminPanel() {
                                     <tr>
                                         <th>Username</th>
                                         <th>Email</th>
+                                        <th>Phone Number</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {
-                                        users.length>0?
-                                        users.map((user) => (
-                                        <tr >
-                                            <td>{user.username}</td>
-                                            <td>{user.email}</td>
-                                            <td>
-                                                <Button variant="warning" size="sm" onClick={() => handleEditUser(user)}>Edit</Button>{' '}
-                                                <Button variant="danger" size="sm" onClick={() => handleDeleteUser(user.id)}>Delete</Button>
-                                            </td>
-                                        </tr>
-                                    )):<p>NO USER DETAILS FOUND!</p>
+                                        users.length > 0 ?
+                                            users.map((user) => (
+                                                <tr >
+                                                    <td>{user.username}</td>
+                                                    <td>{user.email}</td>
+                                                    <td>{user.phone}</td>
+                                                    <td>
+                                                        <Button variant="warning" size="sm" onClick={() => handleEditUser(user)}>Edit</Button>{' '}
+                                                        <Button variant="danger" size="sm" onClick={() => handleDeleteUser(user.id)}>Delete</Button>
+                                                    </td>
+                                                </tr>
+                                            )) : <p>NO USER DETAILS FOUND!</p>
                                     }
                                 </tbody>
                             </Table>
@@ -186,31 +206,43 @@ function AdminPanel() {
                             <Table striped bordered hover>
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
                                         <th>Name</th>
                                         <th>Type</th>
-                                        <th>Description</th>
+                                        <th>Age</th>
+                                        <th>Health</th>
+                                        <th>Next Vet Appointment</th>
+                                        <th>Vaccinations</th>
+                                        <th>Owner</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {
-                                        pets.length>0?
-                                        pets.map((pet) => (
-                                        <tr key={pet.id}>
-                                            <td>{pet.id}</td>
-                                            <td>{pet.name}</td>
-                                            <td>{pet.type}</td>
-                                            <td>{pet.description}</td>
-                                            <td>
-                                                <Button variant="warning" size="sm" onClick={() => handleEditPet(pet)}>Edit</Button>{' '}
-                                                <Button variant="danger" size="sm" onClick={() => handleDeletePet(pet.id)}>Delete</Button>
-                                            </td>
-                                        </tr>
-                                    )):<p>NO PET DETAILS FOUND!</p>
+                                        pets.length > 0 ? (
+                                            pets.map((pet) => (
+                                                <tr key={pet._id}>
+                                                    <td>{pet.name}</td>
+                                                    <td>{pet.type}</td>
+                                                    <td>{pet.age}</td>
+                                                    <td>{pet.health}</td>
+                                                    <td>{pet.nextVetAppointment?.slice(0, 10)}</td>
+                                                    <td>{pet.vaccinations}</td>
+                                                    <td>{pet.userId?.username || 'Unknown'}</td>
+                                                    <td>
+                                                        <Button variant="warning" size="sm" onClick={() => handleEditPet(pet)}>Edit</Button>{' '}
+                                                        <Button variant="danger" size="sm" onClick={() => handleDeletePet(pet._id)}>Delete</Button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="8" className="text-center">NO PET DETAILS FOUND!</td>
+                                            </tr>
+                                        )
                                     }
                                 </tbody>
                             </Table>
+
                         </>
                     )}
 
@@ -220,7 +252,6 @@ function AdminPanel() {
                             <Table striped bordered hover>
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
                                         <th>Name</th>
                                         <th>Type</th>
                                         <th>Status</th>
@@ -230,27 +261,26 @@ function AdminPanel() {
                                 </thead>
                                 <tbody>
                                     {
-                                        lostAndFoundPets?.length>0?
-                                        lostAndFoundPets.map((pet) => (
-                                        <tr key={pet.id}>
-                                            <td>{pet.id}</td>
-                                            <td>{pet.name}</td>
-                                            <td>{pet.type}</td>
-                                            <td>{pet.status}</td>
-                                            <td>{pet.category}</td>
-                                            <td>
-                                                {pet.status === "Pending" && (
-                                                    <>
-                                                        <Button variant="success" size="sm" onClick={() => handleApprovePet(pet.id)}>Approve</Button>{' '}
-                                                        <Button variant="danger" size="sm" onClick={() => handleRejectPet(pet.id)}>Reject</Button>{' '}
-                                                    </>
-                                                )}
-                                                {pet.status === "Approved" && (
-                                                    <Button variant="danger" size="sm" onClick={() => handleDeleteLostFoundPet(pet.id)}>Delete</Button>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    )):<p>NO LOST PETS LISTING</p>
+                                        lostAndFoundPets?.length > 0 ?
+                                            lostAndFoundPets.map((pet) => (
+                                                <tr>
+                                                    <td>{pet.name}</td>
+                                                    <td>{pet.type}</td>
+                                                    <td>{pet.status}</td>
+                                                    <td>{pet.category}</td>
+                                                    <td>
+                                                        {pet.status === "Pending" && (
+                                                            <>
+                                                                <Button variant="success" size="sm" onClick={() => handleApprovePet(pet.id)}>Approve</Button>{' '}
+                                                                <Button variant="danger" size="sm" onClick={() => handleRejectPet(pet.id)}>Reject</Button>{' '}
+                                                            </>
+                                                        )}
+                                                        {pet.status === "Approved" && (
+                                                            <Button variant="danger" size="sm" onClick={() => handleDeleteLostFoundPet(pet.id)}>Delete</Button>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            )) : <p>NO LOST PETS LISTING</p>
                                     }
                                 </tbody>
                             </Table>

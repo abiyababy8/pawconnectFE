@@ -29,6 +29,10 @@ export const addUserPetApi = async (data, reqHeader) => {
 export const getUserPetApi = async (reqHeader) => {
     return await commonApi('GET', `${base_url}/user/pets`, "", reqHeader)
 }
+// get alluser pets
+export const getAllPetDetailsApi = async (reqHeader) => {
+    return await commonApi('GET', `${base_url}/alluser/pets`, "", reqHeader)
+}
 //update userPets
 export const editUserPetApi = async (id, reqBody, reqHeader) => {
     return await commonApi('PUT', `${base_url}/user/pets/${id}`, reqBody, reqHeader)
