@@ -1,36 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button, Form, Container, Row, Col, Modal } from "react-bootstrap";
 import "../App.css";
+import { getAllUserDetailsApi, getUserDetailsApi } from "../services/allApi";
 
 function AdminPanel() {
     const [selectedSection, setSelectedSection] = useState("users");
 
     // Sample Data
-    const [users, setUsers] = useState([
-        { id: 1, username: "john_doe", email: "john@example.com" },
-        { id: 2, username: "jane_doe", email: "jane@example.com" }
-    ]);
+    const [users, setUsers] = useState([]);
 
-    const [pets, setPets] = useState([
-        { id: 1, name: "Buddy", type: "Dog", description: "Friendly Golden Retriever", approved: false },
-        { id: 2, name: "Whiskers", type: "Cat", description: "Curious tabby cat", approved: false }
-    ]);
+    const [pets, setPets] = useState([]);
 
-    const [lostAndFoundPets, setLostAndFoundPets] = useState([
-        { id: 1, name: "Max", type: "Dog", status: "Pending", category: "lost" },
-        { id: 2, name: "Luna", type: "Cat", status: "Pending", category: "found" }
-    ]);
+    const [lostAndFoundPets, setLostAndFoundPets] = useState([]);
 
-    const [adoptions, setAdoptions] = useState([
-        { id: 1, user: "john_doe", petName: "Buddy", petType: "Dog", status: "Pending" },
-        { id: 2, user: "jane_doe", petName: "Whiskers", petType: "Cat", status: "Pending" }
-    ]);
+    const [adoptions, setAdoptions] = useState([]);
 
     // Modals
     const [showModal, setShowModal] = useState(false);
     const [editUser, setEditUser] = useState(null);
     const [editPet, setEditPet] = useState(null);
-
+    const getUsers = async () => {
+        try {
+            const token = sessionStorage.getItem("token")
+            const reqHeader = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+            const result = await getAllUserDetailsApi(reqHeader)
+            console.log(result.data)
+            setUsers(result.data)
+        } catch (error) {
+            console.log("Something Happened", error)
+        }
+    }
+    useEffect(()=>{
+        getUsers()
+    },[])
     // User handlers
     const handleAddUser = () => {
         setEditUser({ id: users.length + 1, username: "", email: "" });
@@ -150,16 +155,16 @@ function AdminPanel() {
                             <Table striped bordered hover>
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
                                         <th>Username</th>
                                         <th>Email</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {users.map((user) => (
-                                        <tr key={user.id}>
-                                            <td>{user.id}</td>
+                                    {
+                                        users.length>0?
+                                        users.map((user) => (
+                                        <tr >
                                             <td>{user.username}</td>
                                             <td>{user.email}</td>
                                             <td>
@@ -167,7 +172,8 @@ function AdminPanel() {
                                                 <Button variant="danger" size="sm" onClick={() => handleDeleteUser(user.id)}>Delete</Button>
                                             </td>
                                         </tr>
-                                    ))}
+                                    )):<p>NO USER DETAILS FOUND!</p>
+                                    }
                                 </tbody>
                             </Table>
                         </>
@@ -188,7 +194,9 @@ function AdminPanel() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {pets.map((pet) => (
+                                    {
+                                        pets.length>0?
+                                        pets.map((pet) => (
                                         <tr key={pet.id}>
                                             <td>{pet.id}</td>
                                             <td>{pet.name}</td>
@@ -199,7 +207,8 @@ function AdminPanel() {
                                                 <Button variant="danger" size="sm" onClick={() => handleDeletePet(pet.id)}>Delete</Button>
                                             </td>
                                         </tr>
-                                    ))}
+                                    )):<p>NO PET DETAILS FOUND!</p>
+                                    }
                                 </tbody>
                             </Table>
                         </>
@@ -220,7 +229,9 @@ function AdminPanel() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {lostAndFoundPets.map((pet) => (
+                                    {
+                                        lostAndFoundPets?.length>0?
+                                        lostAndFoundPets.map((pet) => (
                                         <tr key={pet.id}>
                                             <td>{pet.id}</td>
                                             <td>{pet.name}</td>
@@ -239,7 +250,8 @@ function AdminPanel() {
                                                 )}
                                             </td>
                                         </tr>
-                                    ))}
+                                    )):<p>NO LOST PETS LISTING</p>
+                                    }
                                 </tbody>
                             </Table>
                         </>

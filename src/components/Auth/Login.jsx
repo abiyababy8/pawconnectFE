@@ -29,81 +29,77 @@ function Login() {
     const navigate = useNavigate()
 
     const handleLogin = async (e) => {
-        e.preventDefault(); // Prevent form from refreshing the page
+    e.preventDefault();
 
-        const { username, password } = data;
+    const { username, password } = data;
 
-        if (!username || !password) {
-            toast.warning("Please fill the form completely!");
+    if (!username || !password) {
+        toast.warning("Please fill the form completely!");
+        return;
+    }
+
+    let valid = true;
+    let newErrors = { username: "", password: "" };
+
+    if (username.trim() === "") {
+        newErrors.username = "Username is required.";
+        valid = false;
+    }
+
+    if (password.trim() === "") {
+        newErrors.password = "Password is required.";
+        valid = false;
+    } else if (password.length < 6) {
+        newErrors.password = "Password must be at least 6 characters.";
+        valid = false;
+    }
+
+    setErrors(newErrors);
+    if (!valid) return;
+
+    try {
+        const result = await loginApi(data); // login API call
+
+        if (result.status === 200) {
+            const userData = result.data.user_data;
+            const token = result.data.jwt_token;
+
+            // Determine role from username
+            let role = "user"; // default
+            if (username === "admin") role = "admin";
+            else if (username === "shelter") role = "shelter";
+
+            const user = {
+                username: userData.username,
+                role: role
+            };
+
+            // Store token and role info
+            sessionStorage.setItem("user", JSON.stringify(user));
+            sessionStorage.setItem("token", token);
+
+            // Toast + navigate based on role
+            toast.success(`${role.charAt(0).toUpperCase() + role.slice(1)} Login Successful!`);
+
+            if (role === "admin") {
+                navigate("/admin");
+            } else if (role === "shelter") {
+                navigate("/shelterpanel");
+            } else {
+                navigate("/user-home");
+            }
+
+        } else if (result.status === 406) {
+            toast.error("Invalid Username or Password!");
         } else {
-            // Validate username and password before calling the API
-            let valid = true;
-            let newErrors = { username: "", password: "" };
-
-            if (username.trim() === "") {
-                newErrors.username = "Username is required.";
-                valid = false;
-            }
-
-            if (password.trim() === "") {
-                newErrors.password = "Password is required.";
-                valid = false;
-            } else if (password.length < 6) {
-                newErrors.password = "Password must be at least 6 characters.";
-                valid = false;
-            }
-
-            setErrors(newErrors);
-
-            // If validation passes, proceed with login
-            if (valid) {
-                // Check predefined passwords for admin and shelter
-                if (username === "admin" && password === "admin@123") {
-                    // Admin login, no token
-                    const user = { username, role: "admin" };
-                    sessionStorage.setItem("user", JSON.stringify(user));
-                    toast.success("Admin Login Successful!");
-                    navigate('/admin'); // Navigate to Admin dashboard
-                } else if (username === "shelter" && password === "shelter@123") {
-                    // Shelter login, no token
-                    const user = { username, role: "shelter" };
-                    sessionStorage.setItem("user", JSON.stringify(user));
-                    toast.success("Shelter Login Successful!");
-                    navigate('/shelterpanel'); // Navigate to Shelter dashboard
-                } else {
-                    // For user login, call API
-                    try {
-                        const result = await loginApi(data); // Pass 'data' here, not 'userData'
-
-                        if (result.status === 200) {
-                            const userData = result.data.user_data; // Get the full user data object
-                            const user = {
-                                username: userData.username, // Extract username
-                                role: "user" // Extract role
-                            };
-
-                            // Save user info and token in sessionStorage
-                            sessionStorage.setItem("user", JSON.stringify(user));
-                            sessionStorage.setItem("token", result.data.jwt_token); // Only store token for user
-
-                            // Redirect user to the appropriate page based on the role
-                            if (user.role === 'user') {
-                                toast.success("User Login Successful!");
-                                navigate('/user-home'); // Navigate to User dashboard or homepage
-                            }
-                        } else if (result.status === 406) {
-                            toast.error("Invalid Username or Password!");
-                        } else {
-                            toast.error("Something bad happened!");
-                        }
-                    } catch (error) {
-                        console.error("Login API error:", error);
-                        toast.error("Something went wrong while logging in.");
-                    }
-                }
-            }
+            toast.error("Something bad happened!");
         }
-    };
+    } catch (error) {
+        console.error("Login API error:", error);
+        toast.error("Something went wrong while logging in.");
+    }
+};
+
 
 
     const handleClear = () => {

@@ -9,6 +9,10 @@ export const registerApi = async (userData) => {
 export const loginApi = async (data) => {
     return await commonApi("POST", `${base_url}/user/login`, data, "")
 }
+//get All users
+export const getAllUserDetailsApi=async(reqHeader)=>{
+    return await commonApi("GET", `${base_url}/user/allUserDetails`, "", reqHeader)
+}
 //get userDetails
 export const getUserDetailsApi = async (reqHeader) => {
     return await commonApi("GET", `${base_url}/user/userDetails`, "", reqHeader)
