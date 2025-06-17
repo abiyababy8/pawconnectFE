@@ -10,7 +10,7 @@ export const loginApi = async (data) => {
     return await commonApi("POST", `${base_url}/user/login`, data, "")
 }
 //get All users
-export const getAllUserDetailsApi=async(reqHeader)=>{
+export const getAllUserDetailsApi = async (reqHeader) => {
     return await commonApi("GET", `${base_url}/user/allUserDetails`, "", reqHeader)
 }
 //get userDetails
@@ -20,6 +20,10 @@ export const getUserDetailsApi = async (reqHeader) => {
 //edit userDetails
 export const editUserApi = async (id, reqBody, reqHeader) => {
     return await commonApi('PUT', `${base_url}/user/edit/${id}`, reqBody, reqHeader)
+}
+// delete user
+export const deleteUserApi = async (id, reqHeader) => {
+    return await commonApi('PUT', `${base_url}/user/delete/${id}`, {}, reqHeader)
 }
 //add userPets
 export const addUserPetApi = async (data, reqHeader) => {
@@ -92,6 +96,10 @@ export const addAdoptRequestApi = async (data, reqHeader) => {
 // get my adoption requests
 export const getUserAdoptRequestApi = async (reqHeader) => {
     return await commonApi('GET', `${base_url}/user-adopt/request`, "", reqHeader)
+}
+//  get all adoption requests
+export const getAllAdoptRequestApi = async (reqHeader) => {
+    return await commonApi('GET', `${base_url}/all-adopt/request`, "", reqHeader)
 }
 // update status of adoption request
 export const updateAdoptRequestStatusApi = async (id, status, headers) => {
