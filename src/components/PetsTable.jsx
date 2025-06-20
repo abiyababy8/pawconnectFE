@@ -56,7 +56,7 @@ function PetsTable() {
                                             <td>{pet.health}</td>
                                             <td>{pet.nextVetAppointment?.slice(0, 10)}</td>
                                             <td>{pet.vaccinations}</td>
-                                            <td>{pet.userId?.username || 'Unknown'}</td>
+                                            <td>{pet.userId?.name || 'Unknown'}</td>
                                             <td>
                                                 <Button variant="warning" size="sm" onClick={() => handleEditPet(pet)}>Edit</Button>{' '}
                                                 <Button variant="danger" size="sm" onClick={() => handleDeletePet(pet._id)}>Delete</Button>

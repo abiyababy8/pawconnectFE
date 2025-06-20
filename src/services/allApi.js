@@ -21,9 +21,13 @@ export const getUserDetailsApi = async (reqHeader) => {
 export const editUserApi = async (id, reqBody, reqHeader) => {
     return await commonApi('PUT', `${base_url}/user/edit/${id}`, reqBody, reqHeader)
 }
+//edit user role
+export const editUserRoleApi = async (id, role, reqHeader) => {
+    return await commonApi('PUT', `${base_url}/user/edit/${id}/role`, { role }, reqHeader)
+}
 // delete user
 export const deleteUserApi = async (id, reqHeader) => {
-    return await commonApi('PUT', `${base_url}/user/delete/${id}`, {}, reqHeader)
+    return await commonApi('DELETE', `${base_url}/user/delete/${id}`, {}, reqHeader)
 }
 //add userPets
 export const addUserPetApi = async (data, reqHeader) => {

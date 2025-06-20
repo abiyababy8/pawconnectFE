@@ -19,7 +19,7 @@ function AdminPanel() {
 
     useEffect(() => {
         fetchCounts();
-    }, []);
+    }, [selectedSection]);
 
     const fetchCounts = async () => {
         try {
@@ -31,8 +31,8 @@ function AdminPanel() {
 
             const usersRes = await getAllUserDetailsApi(reqHeader);
             const users = usersRes?.data || [];
-            const normalUsers = users.filter(user => user.username !== "admin" && user.username !== "shelter");
-            const shelters = users.filter(user => user.username === "shelter");
+            const normalUsers = users.filter(user => user.role === "user" );
+            const shelters = users.filter(user => user.role === "shelter");
 
             const petsRes = await getAllPetDetailsApi(reqHeader);
             const pets = petsRes?.data || [];
