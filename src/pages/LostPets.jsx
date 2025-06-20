@@ -12,17 +12,18 @@ function LostPets() {
     const [showLostModal, setShowLostModal] = useState(false);
     const [selectedPetId, setSelectedPetId] = useState(null);
     const [foundLocation, setFoundLocation] = useState('');
+    const user=sessionStorage.getItem("user")
     const [newLostPet, setNewLostPet] = useState({
         name: '',
         type: '',
         description: '',
-        owner: '',
+        owner: user.username,
         location: '',
         lostPetImage: '',
         status: 'Not Found'
     });
     const [imagePreview, setImagePreview] = useState(null);
-    const [pets, setPets] = useState([]); // ✅ FIXED: should be an array
+    const [pets, setPets] = useState([]); 
 
     const handleFoundClick = (petId) => {
         setSelectedPetId(petId);
@@ -84,7 +85,7 @@ function LostPets() {
             toast.success("Lost pet reported successfully!");
             getLostPet();
             setNewLostPet({
-                name: '', type: '', description: '', owner: '', location: '', lostPetImage: ''
+                name: '', type: '', description: '', owner: user.username, location: '', lostPetImage: ''
             });
             setImagePreview(null);
             setShowLostModal(false);

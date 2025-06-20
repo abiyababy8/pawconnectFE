@@ -64,26 +64,16 @@ function Login() {
             const userData = result.data.user_data;
             const token = result.data.jwt_token;
 
-            // Determine role from username
-            let role = "user"; // default
-            if (username === "admin") role = "admin";
-            else if (username === "shelter") role = "shelter";
-
-            const user = {
-                username: userData.username,
-                role: role
-            };
-
             // Store token and role info
-            sessionStorage.setItem("user", JSON.stringify(user));
+            sessionStorage.setItem("user", JSON.stringify(userData));
             sessionStorage.setItem("token", token);
 
             // Toast + navigate based on role
-            toast.success(`${role.charAt(0).toUpperCase() + role.slice(1)} Login Successful!`);
+            toast.success(`${userData.role.charAt(0).toUpperCase() + userData.role.slice(1)} Login Successful!`);
 
-            if (role === "admin") {
+            if (userData.role === "admin") {
                 navigate("/admin");
-            } else if (role === "shelter") {
+            } else if (userData.role === "shelter") {
                 navigate("/shelterpanel");
             } else {
                 navigate("/user-home");

@@ -6,7 +6,7 @@ function Nav() {
     const dropdownRef = useRef(null);
     const user = JSON.parse(sessionStorage.getItem("user"));
     const role = user?.role;
-    const username = user?.username.toUpperCase();
+    const username = user?.name;
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -24,18 +24,18 @@ function Nav() {
     return (
         <>
             <div className="nav-bar d-flex justify-content-between">
-                <div className='d-flex'>
-                    <i className="fa-solid fa-paw nav-bar-brand fa-beat mt-3 me-2 ms-2 fa-2x"></i>
-                    <h3 className='mt-3'>PawConnect</h3>
+                <div className='d-flex align-items-center'>
+                    <i className="fa-solid fa-paw nav-bar-brand fa-beat mt-2 me-2 ms-2 "></i>
+                    <h4 className='mt-3'>PawConnect</h4>
                 </div>
-                <div className="user-dropdown position-relative" ref={dropdownRef}>
+                <div className="d-flex align-items-center user-dropdown position-relative" ref={dropdownRef}>
                     <i
-                        className="fa-solid fa-user fa-2x"
+                        className="fa-solid fa-user"
                         onClick={() => setShowDropDown(!showDropDown)}
                         style={{ cursor: 'pointer' }}
                     ></i>
                     <br />
-                    <span className='me-2'>{username}</span>
+                    <span className='me-2'>{username?<>Hi, {username}</>:""}</span>
                     {showDropDown && (
                         <div className="dropdown-menu-custom">
                             {role === 'user' ? (

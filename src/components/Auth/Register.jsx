@@ -9,14 +9,17 @@ import { toast, ToastContainer } from 'react-toastify';
 
 function Register() {
     const [data, setData] = useState({
+        name: '',
         username: '',
         email: '',
         phone: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        role:'user'
     });
 
     const [errors, setErrors] = useState({
+        name: '',
         username: '',
         email: '',
         phone: '',
@@ -35,7 +38,12 @@ function Register() {
     const handleRegister = async (e) => {
         e.preventDefault();
         let valid = true;
-        let newErrors = { username: '', email: '', phone: '', password: '', confirmPassword: '' };
+        let newErrors = { name: '', username: '', email: '', phone: '', password: '', confirmPassword: '' };
+
+        if (data.name.trim() === '') {
+            newErrors.name = 'Name is required.';
+            valid = false;
+        }
 
         if (data.username.trim() === '') {
             newErrors.username = 'Username is required.';
@@ -80,7 +88,7 @@ function Register() {
                 toast.success('Registered Successfully!');
                 navigate('/login');
             }
-            else if(result.status===401){
+            else if (result.status === 401) {
                 toast.error('Something Happened!')
             }
 
@@ -91,13 +99,16 @@ function Register() {
     };
     const handleClear = () => {
         setData({
+            name: '',
             username: '',
             email: '',
             phone: '',
             password: '',
-            confirmPassword: ''
+            confirmPassword: '',
+            role:'user'
         });
         setErrors({
+            name: '',
             username: '',
             email: '',
             phone: '',
@@ -114,6 +125,20 @@ function Register() {
                 <div className="col-md-6 border border-secondary p-5 rounded">
                     <h3 className="text-center mb-4" style={{ color: '#FF914D' }}>Create an Account</h3>
                     <Form onSubmit={handleRegister}>
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm={3}>Name:</Form.Label>
+                            <Col sm={9}>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Enter name"
+                                    name="name"
+                                    value={data.name}
+                                    onChange={handleInputChange}
+                                />
+                                {errors.name && <small className="text-danger">{errors.name}</small>}
+                            </Col>
+                        </Form.Group>
+
                         <Form.Group as={Row} className="mb-3">
                             <Form.Label column sm={3}>Username:</Form.Label>
                             <Col sm={9}>

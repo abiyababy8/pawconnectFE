@@ -12,14 +12,16 @@ function Pets() {
   const [showAdoptModal, setShowAdoptModal] = useState(false);
   const [showAddPetModal, setShowAddPetModal] = useState(false);
   const [selectedPet, setSelectedPet] = useState("");
-  const [newPet, setNewPet] = useState({ name: '', type: '', description: '', owner: '', lastLocation: '', image: null, status: 'Pending' });
+  const user = JSON.parse(sessionStorage.getItem("user"))
+  const [newPet, setNewPet] = useState({ name: '', type: '', description: '', owner: user.name, lastLocation: '', image: null, status: 'Pending' });
   const [imagePreview, setImagePreview] = useState(null);
+
   const [requestDetails, setRequestDetails] = useState({
-    name: "",
-    contact: "",
+    name: user.name,
+    contact: user.email,
     donation: "",
     pet: "",
-    status:'Request submitted'
+    status: 'Request submitted'
   })
   const navigate = useNavigate();
 
@@ -60,7 +62,7 @@ function Pets() {
     try {
       const result = await addAdoptPetDetailsApi(reqBody, reqHeader);
       console.log("Pets to be adopted:", result);
-      setNewPet({ name: '', type: '', description: '', owner: '', lastLocation: '', image: null, status: 'pending' });
+      setNewPet({ name: '', type: '', description: '', owner: user.name, lastLocation: '', image: null, status: 'pending' });
       setImagePreview(null);
       setShowAddPetModal(false);
       getAdoptPetListing();
@@ -105,7 +107,7 @@ function Pets() {
   }, []);
 
   const handleAddAdoptionRequest = async () => {
-    const { name, contact, donation,status } = requestDetails
+    const { name, contact, donation, status } = requestDetails
 
     if (!name || !contact || !donation) {
       toast.warning("Please fill the form completely!")
@@ -130,22 +132,22 @@ function Pets() {
           console.log(result.data)
           toast.success(result.data)
           setRequestDetails({
-            name: "",
-            contact: "",
+            name: user.name,
+            contact: user.email,
             donation: "",
             pet: "",
-            status:"Request submitted"
+            status: "Request submitted"
           })
           setShowAdoptModal(false)
         }
         else if (result.status === 406) {
           toast.warning("You have already Submitted request for this pet")
           setRequestDetails({
-            name: "",
-            contact: "",
+            name: user.username,
+            contact: user.email,
             donation: "",
             pet: "",
-            status:"Request submitted"
+            status: "Request submitted"
           })
           setShowAdoptModal(false)
         }
@@ -178,7 +180,12 @@ function Pets() {
                 <Card.Text>{pet.description?.slice(0, 28)}...</Card.Text>
                 <Card.Text><strong>Owner:</strong> {pet.owner}</Card.Text>
                 <Card.Text><strong>Location:</strong> {pet.lastLocation}</Card.Text>
-                <Button variant="info" onClick={() => handleAdoptClick(pet)}>Adopt</Button>
+                {
+                  pet.owner === user.name ? 
+                  <Button variant="info" onClick={() => handleAdoptClick(pet)} disabled>Adopt</Button>
+                   : 
+                  <Button variant="info" onClick={() => handleAdoptClick(pet)}>Adopt</Button>
+                }
               </Card.Body>
             </Card>
           </Col>
@@ -215,11 +222,11 @@ function Pets() {
             </Form.Group>
             <Form.Group controlId="formName">
               <Form.Label>Your Name</Form.Label>
-              <Form.Control type="text" placeholder="Enter your name" onChange={(e) => setRequestDetails({ ...requestDetails, name: e.target.value })} />
+              <Form.Control type="text" placeholder="Enter your name" onChange={(e) => setRequestDetails({ ...requestDetails, name: e.target.value })} value={requestDetails.name} />
             </Form.Group>
             <Form.Group controlId="formContact" className="mt-3">
               <Form.Label>Contact Info</Form.Label>
-              <Form.Control type="text" placeholder="Enter your contact details" onChange={(e) => setRequestDetails({ ...requestDetails, contact: e.target.value })} />
+              <Form.Control type="text" placeholder="Enter your contact details" onChange={(e) => setRequestDetails({ ...requestDetails, contact: e.target.value })} value={requestDetails.contact} />
             </Form.Group>
             <Form.Group controlId="formDonation" className="mt-4">
               <Form.Label>Support Our Rescue Efforts</Form.Label>
