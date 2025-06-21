@@ -12,12 +12,12 @@ function LostPets() {
     const [showLostModal, setShowLostModal] = useState(false);
     const [selectedPetId, setSelectedPetId] = useState(null);
     const [foundLocation, setFoundLocation] = useState('');
-    const user=sessionStorage.getItem("user")
+    const user=JSON.parse(sessionStorage.getItem("user"))
     const [newLostPet, setNewLostPet] = useState({
         name: '',
         type: '',
         description: '',
-        owner: user.username,
+        owner: user.name,
         location: '',
         lostPetImage: '',
         status: 'Not Found'
@@ -85,7 +85,7 @@ function LostPets() {
             toast.success("Lost pet reported successfully!");
             getLostPet();
             setNewLostPet({
-                name: '', type: '', description: '', owner: user.username, location: '', lostPetImage: ''
+                name: '', type: '', description: '', owner: user.name, location: '', lostPetImage: ''
             });
             setImagePreview(null);
             setShowLostModal(false);
