@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getAllAdoptRequestApi } from '../services/allApi';
+import { deleteAdoptRequestApi, getAllAdoptRequestApi, updateAdoptRequestStatusApi } from '../services/allApi';
 import { Button, Table } from 'react-bootstrap';
 
 function PetAdoptionTable() {
@@ -22,6 +22,32 @@ function PetAdoptionTable() {
     useEffect(() => {
         getAdoptionRequests()
     }, [])
+    const handleApproveAdoptionRequest = async (id, status) => {
+        try {
+            const token = sessionStorage.getItem("token");
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+            const result = await updateAdoptRequestStatusApi(id, status, headers)
+            getAdoptionRequests()
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    const handleDeleteAdoptionRequest = async (id) => {
+        try {
+            const token = sessionStorage.getItem('token')
+            const reqHeader = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+            const result = await deleteAdoptRequestApi(id, reqHeader)
+            getAdoptionRequests()
+        } catch (error) {
+            console.log(error)
+        }
+    }
     return (
         <>
             <h4>Approve Adoptions</h4>
@@ -53,12 +79,12 @@ function PetAdoptionTable() {
                                     <td>
                                         {adoption.status === "Request submitted" && (
                                             <>
-                                                <Button variant="success" size="sm" className="me-1" >Approve</Button>
-                                                <Button variant="danger" size="sm" >Reject</Button>
+                                                <Button variant="success" size="sm" className="me-1" onClick={() => { const updatedStatus = 'Approved'; handleApproveAdoptionRequest(adoption._id, updatedStatus) }}>Approve</Button>
+                                                <Button variant="danger" size="sm" onClick={() => handleDeleteAdoptionRequest(adoption._id)}>Reject</Button>
                                             </>
                                         )}
                                         {adoption.status === "Approved" && (
-                                            <Button variant="danger" size="sm" >Delete</Button>
+                                            <Button variant="danger" size="sm" onClick={() => handleDeleteAdoptionRequest(adoption._id)}>Delete</Button>
                                         )}
                                     </td>
                                 </tr>

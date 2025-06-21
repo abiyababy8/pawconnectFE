@@ -187,7 +187,7 @@ function UserTable() {
                                                         password: shelter.password
 
                                                     })
-                                            }}>Edit</Button>{' '}
+                                            }}>Edit Shelter</Button>{' '}
                                             <Button variant="danger" size="sm" onClick={() => handleDeleteShelter(shelter._id)}>Delete</Button>
                                         </td>
                                     </tr>

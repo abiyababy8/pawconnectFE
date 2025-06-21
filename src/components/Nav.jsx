@@ -35,7 +35,10 @@ function Nav() {
                         style={{ cursor: 'pointer' }}
                     ></i>
                     <br />
-                    <span className='me-2'>{username?<>Hi, {username}</>:""}</span>
+                    {
+                        role === 'admin' ? <span className='me-2'>Hi, Admin</span> :
+                            <span className='me-2'>{username ? <>Hi, {username}</> : ""}</span>
+                    }
                     {showDropDown && (
                         <div className="dropdown-menu-custom">
                             {role === 'user' ? (

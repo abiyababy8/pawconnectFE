@@ -7,6 +7,7 @@ import PetsTable from "../components/PetsTable";
 import LostPetsTable from "../components/LostPetsTable";
 import PetAdoptionTable from "../components/PetAdoptionTable";
 
+
 function AdminPanel() {
     const [selectedSection, setSelectedSection] = useState("dashboard")
     const [counts, setCounts] = useState({
@@ -91,19 +92,26 @@ function AdminPanel() {
                         <>
                             <h2 className="mb-4">📊 Admin Dashboard</h2>
                             <Row className="mb-4">
-                                <Col md={3}><Card body>👤 Users: {counts.users}</Card></Col>
-                                <Col md={3}><Card body>🏠 Shelters: {counts.shelters}</Card></Col>
-                                <Col md={3}><Card body>🐾 Pets: {counts.pets}</Card></Col>
-                                <Col md={3}><Card body>🆘 Lost Pets: {counts.lostPets}</Card></Col>
-                                <Col md={3}><Card body>❤️ Adoption Requests: {counts.adoptions}</Card></Col>
+                                <Col md={3}><Card body className="mb-2">👤 Users: {counts.users}</Card></Col>
+                                <Col md={3}><Card body className="mb-2">🏠 Shelters: {counts.shelters}</Card></Col>
+                                <Col md={3}><Card body className="mb-2">🐾 Pets: {counts.pets}</Card></Col>
+                                <Col md={3}><Card body className="mb-2">🆘 Lost Pets: {counts.lostPets}</Card></Col>
+                                <Col md={3}><Card body className="mb-2">❤️ Adoption Requests: {counts.adoptions}</Card></Col>
                             </Row>
 
-                            <h4 className="mt-5">🔥 Most Reported Locations </h4>
+                            {
+                                counts.lostPets>0?
+                                <>
+                                <h4 className="mt-5">🔥 Most Reported Locations </h4>
                             <ul>
                                 {Object.entries(counts.hotspots).map(([location, count]) => (
                                     <li key={location}> 📍 {location}: {count} reports</li>
                                 ))}
                             </ul>
+                                </>:
+                                <>
+                                </>
+                            }
                         </>
                     )}
 
@@ -120,7 +128,9 @@ function AdminPanel() {
                     )}
 
                     {selectedSection === "adoptions" && (
+                        <>
                         <PetAdoptionTable />
+                        </>
                     )}
                 </Col>
             </Row>

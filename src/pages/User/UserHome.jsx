@@ -28,6 +28,7 @@ function UserHome() {
     nextVetAppointment: "",
     vaccinations: "",
     userPetImage: "",
+    status:''
   })
   const [editPetDetails, setEditPetDetails] = useState({
     name: "",

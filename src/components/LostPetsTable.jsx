@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getLostPetApi } from '../services/allApi';
+import { deleteLostPetApi, getLostPetApi, updateLostPetStatusApi } from '../services/allApi';
 import { Button, Table } from 'react-bootstrap';
 
 function LostPetsTable() {
@@ -22,18 +22,35 @@ function LostPetsTable() {
     useEffect(() => {
         getLostPets()
     }, [])
-    const handleApprovePet=(id)=>{
-
+    const handleApprovePet = async (id, status) => {
+        try {
+            const token = sessionStorage.getItem("token");
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+            const result = await updateLostPetStatusApi(id, status, headers)
+            getLostPets()
+        } catch (error) {
+            console.log(error)
+        }
     }
-    const handleRejectPet=(id)=>{
-
-    }
-    const handleDeleteLostFoundPet=(id)=>{
-
+    const handleDeleteLostFoundPet = async (id) => {
+        try {
+            const token = sessionStorage.getItem('token')
+            const reqHeader = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+            const result = await deleteLostPetApi(id, reqHeader)
+            getLostPets()
+        } catch (error) {
+            console.log(error)
+        }
     }
     return (
         <>
-        
+
             <h4>Lost & Found Pets Approval</h4>
             {
                 lostAndFoundPets?.length > 0 ?
@@ -61,12 +78,12 @@ function LostPetsTable() {
                                         <td>
                                             {pet.status === "Not Found" && (
                                                 <>
-                                                    <Button variant="success" size="sm" onClick={() => handleApprovePet(pet.id)}>Approve</Button>{' '}
-                                                    <Button variant="danger" size="sm" onClick={() => handleRejectPet(pet.id)}>Reject</Button>{' '}
+                                                    <Button variant="success" size="sm" onClick={() => { const updatedStatus = 'Found'; handleApprovePet(pet._id, updatedStatus) }}>Approve</Button>{' '}
+                                                    <Button variant="danger" size="sm" onClick={() => handleDeleteLostFoundPet(pet.id)}>Reject</Button>{' '}
                                                 </>
                                             )}
                                             {pet.status === "Found" && (
-                                                <Button variant="danger" size="sm" onClick={() => handleDeleteLostFoundPet(pet.id)}>Delete</Button>
+                                                <Button variant="danger" size="sm" onClick={() => handleDeleteLostFoundPet(pet._id)}>Delete</Button>
                                             )}
                                         </td>
                                     </tr>

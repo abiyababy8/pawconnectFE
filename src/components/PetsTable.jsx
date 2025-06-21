@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Table } from 'react-bootstrap';
-import { getAllPetDetailsApi } from '../services/allApi';
+import { deleteUserPetApi, editUserPetStatusApi, getAllPetDetailsApi } from '../services/allApi';
 function PetsTable() {
     const [pets, setPets] = useState([]);
     const getPets = async () => {
@@ -21,11 +21,31 @@ function PetsTable() {
     useEffect(() => {
         getPets()
     }, [])
-    const handleEditPet = async (data) => {
-
+    const handleApprovePet = async (id, data) => {
+        try {
+            const token = sessionStorage.getItem("token");
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+            const result = await editUserPetStatusApi(id, data, headers)
+            getPets()
+        } catch (error) {
+            console.log(error)
+        }
     }
     const handleDeletePet = async (id) => {
-
+        try {
+            const token = sessionStorage.getItem('token')
+            const reqHeader = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+            const result = await deleteUserPetApi(id, reqHeader)
+            getPets()
+        } catch (error) {
+            console.log(error)
+        }
     }
     return (
         <>
@@ -58,8 +78,15 @@ function PetsTable() {
                                             <td>{pet.vaccinations}</td>
                                             <td>{pet.userId?.name || 'Unknown'}</td>
                                             <td>
-                                                <Button variant="warning" size="sm" onClick={() => handleEditPet(pet)}>Edit</Button>{' '}
-                                                <Button variant="danger" size="sm" onClick={() => handleDeletePet(pet._id)}>Delete</Button>
+                                                {
+                                                    pet.status === 'approved' ?
+                                                        <Button variant="danger" size="sm" onClick={() => handleDeletePet(pet._id)}>Delete</Button>
+                                                        :
+                                                        <>
+                                                            <Button variant="success" size="sm" onClick={() => { const updatedStatus = "approved"; handleApprovePet(pet._id, updatedStatus) }}>Approve</Button>{' '}
+                                                            <Button variant="danger" size="sm" onClick={() => handleDeletePet(pet._id)}>Reject</Button>
+                                                        </>
+                                                }
                                             </td>
                                         </tr>
                                     ))

@@ -49,6 +49,10 @@ export const editUserPetApi = async (id, reqBody, reqHeader) => {
 export const deleteUserPetApi = async (id, reqHeader) => {
     return await commonApi('DELETE', `${base_url}/user/pets/${id}`, {}, reqHeader)
 }
+// update user pet status
+export const editUserPetStatusApi = async (id, status, reqHeader) => {
+    return await commonApi('PUT', `${base_url}/user/pets/${id}/status`, {status}, reqHeader)
+}
 // add lostPets
 export const addLostPetApi = async (data, reqHeader) => {
     return await commonApi('POST', `${base_url}/lost/pets`, data, reqHeader)
