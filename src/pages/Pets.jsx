@@ -172,7 +172,7 @@ function Pets() {
       {/* Pets List */}
       <Row className='justify-content-center'>
         {filteredPets.length > 0 ? filteredPets.map((pet) => (
-          <Col key={pet._id} xs={12} sm={6} md={4} lg={3} className="mb-4">
+          <Col xs={12} sm={6} md={4} lg={3} className="mb-4">
             <Card className="shadow-sm">
               <Card.Img variant="top" src={`${base_url}/uploads/${pet.image}`} className="pet-card-image" />
               <Card.Body className="text-center">
@@ -181,10 +181,14 @@ function Pets() {
                 <Card.Text><strong>Owner:</strong> {pet.owner}</Card.Text>
                 <Card.Text><strong>Location:</strong> {pet.lastLocation}</Card.Text>
                 {
-                  pet.owner === user.name ? 
-                  <Button variant="info" onClick={() => handleAdoptClick(pet)} disabled>Adopt</Button>
-                   : 
-                  <Button variant="info" onClick={() => handleAdoptClick(pet)}>Adopt</Button>
+                  pet.owner === user.name ?
+                    <>
+                      <Link to={'/profile'} style={{ color: 'black', textDecoration: 'none' }} >
+                       <Button variant='info'> Check Status</Button>
+                      </Link>
+                    </>
+                    :
+                    <Button variant="info" onClick={() => handleAdoptClick(pet)}>Adopt</Button>
                 }
               </Card.Body>
             </Card>
@@ -198,11 +202,11 @@ function Pets() {
           Add New Pet for Adoption
         </Button>
         <br />
-        <div className="mt-3">
+        {/* <div className="mt-3">
           <Link to={'/profile'} style={{ color: 'black', textDecoration: 'none' }} className='bg-info rounded p-2'>
             Check Your Pet Adoption Status
           </Link>
-        </div>
+        </div> */}
       </div>
 
       {/* Adopt Modal */}

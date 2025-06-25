@@ -93,6 +93,10 @@ export const getUserAdoptListApi = async (reqHeader) => {
 export const updateAdoptListStatusApi = async (id, status, headers) => {
     return await commonApi("PUT", `${base_url}/adopt/pets/${id}/status`, { status }, headers);
 };
+// update adoption listing
+export const updateAdoptListApi = async (id, data, headers) => {
+    return await commonApi("PUT", `${base_url}/adopt/pets/${id}`, data, headers);
+};
 // delete adoption listing 
 export const deleteAdoptListApi = async (id, reqHeader) => {
     return await commonApi("DELETE", `${base_url}/adopt/pets/${id}`, {}, reqHeader)

@@ -12,7 +12,7 @@ function LostPets() {
     const [showLostModal, setShowLostModal] = useState(false);
     const [selectedPetId, setSelectedPetId] = useState(null);
     const [foundLocation, setFoundLocation] = useState('');
-    const user=JSON.parse(sessionStorage.getItem("user"))
+    const user = JSON.parse(sessionStorage.getItem("user"))
     const [newLostPet, setNewLostPet] = useState({
         name: '',
         type: '',
@@ -23,7 +23,7 @@ function LostPets() {
         status: 'Not Found'
     });
     const [imagePreview, setImagePreview] = useState(null);
-    const [pets, setPets] = useState([]); 
+    const [pets, setPets] = useState([]);
 
     const handleFoundClick = (petId) => {
         setSelectedPetId(petId);
@@ -134,7 +134,7 @@ function LostPets() {
             {/* Pets List */}
             <Row className='justify-content-center'>
                 {filteredPets.length > 0 ? filteredPets.map((pet) => (
-                    <Col key={pet._id} xs={12} sm={6} md={4} lg={3} className="mb-4">
+                    <Col xs={12} sm={6} md={4} lg={3} className="mb-4">
                         <Card className="shadow-sm">
                             <Card.Img variant="top" src={`${base_url}/uploads/${pet.lostPetImage}`} className="pet-card-image" />
                             <Card.Body className="text-center">
@@ -142,7 +142,13 @@ function LostPets() {
                                 <Card.Text>{pet.description?.slice(0, 28)}...</Card.Text>
                                 <Card.Text><strong>Last Seen:</strong> {pet.location}</Card.Text>
                                 <Card.Text><strong>Owner:</strong> {pet.owner}</Card.Text>
-                                <Button variant="info" onClick={() => handleFoundClick(pet._id)}>Report Found</Button>
+                                {
+                                    user?.name === pet.owner ?
+                                        <Link to={'/profile'} style={{ color: 'black', textDecoration: 'none' }}>
+                                            <Button variant="info">Check Status</Button>
+                                        </Link>
+                                        : <Button variant="info" onClick={() => handleFoundClick(pet._id)}>Report Found</Button>
+                                }
                             </Card.Body>
                         </Card>
                     </Col>
@@ -152,8 +158,6 @@ function LostPets() {
             {/* Report Lost Pet Button */}
             <div className="text-center mt-4 mb-4">
                 <Button variant="warning" onClick={() => setShowLostModal(true)}>Report Lost Pet</Button>
-                <div className="mt-3"><Link to={'/profile'} style={{ color: 'black', textDecoration: 'none' }} className='bg-info rounded p-2'>Check Your Lost Pet Status</Link></div>
-
             </div>
 
             {/* Found Modal */}

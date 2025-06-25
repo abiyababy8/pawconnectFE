@@ -276,28 +276,18 @@ function Profile() {
                           <td>{pet.status}</td>
                           <td>
                             {
-                              pet.status == 'Pending' ?
-                                <>
-                                  <button className="btn btn-outline-primary" onClick={() => {
-                                    const updatedStatus = "Adopted";
-                                    updateAdoptionListing(pet._id, updatedStatus);
-                                    setPetsGivenForAdoption(item =>
-                                      item.map(item => item._id === pet._id ? { ...item, status: updatedStatus } : item)
-                                    );
-                                  }}><i className="fa-solid fa-pencil"></i> Mark as Adopted</button>
-                                  <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteAdoptionListing(pet._id)}><i className="fa-solid fa-trash"></i> Delete Listing</button>
-                                </> :
-                                <>
-                                  <button className="btn btn-outline-primary" onClick={() => {
-                                    const updatedStatus = "Pending";
-                                    updateAdoptionListing(pet._id, updatedStatus);
-                                    setPetsGivenForAdoption(item =>
-                                      item.map(item => item._id === pet._id ? { ...item, status: updatedStatus } : item)
-                                    );
-                                  }}><i className="fa-solid fa-pencil"></i> Mark as Pending</button>
-                                  <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteAdoptionListing(pet._id)}><i className="fa-solid fa-trash"></i> Delete Listing</button>
-                                </>
-                            } </td>
+                              pet.status == 'Pending' &&
+                              <>
+                                <button className="btn btn-danger ms-2" onClick={() => handleDeleteAdoptionListing(pet._id)}> Delete</button>
+                              </>
+                            }
+                            {pet.status === 'Approved' &&
+                              <>
+                                <button className="btn btn-danger ms-2" onClick={() => handleDeleteAdoptionListing(pet._id)}> Mark as Adopted</button>
+                              </>
+                            }
+
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -323,27 +313,17 @@ function Profile() {
                           <td>{request.status}</td>
                           <td>
                             {
-                              request.status == 'Request submitted' ?
-                                <>
-                                  <button className="btn btn-outline-primary" onClick={() => {
-                                    const updatedStatus = "Adopted";
-                                    updateAdoptionRequest(request._id, updatedStatus);
-                                    setAdoptionRequests(item =>
-                                      item.map(item => item._id === request._id ? { ...item, status: updatedStatus } : item)
-                                    );
-                                  }}><i className="fa-solid fa-pencil"></i> Mark as Adopted</button>
-                                  <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteAdoptionRequest(request._id)}><i className="fa-solid fa-trash"></i> Delete Request</button>
-                                </> :
-                                <>
-                                  <button className="btn btn-outline-primary" onClick={() => {
-                                    const updatedStatus = "Request submitted";
-                                    updateAdoptionRequest(request._id, updatedStatus);
-                                    setAdoptionRequests(item =>
-                                      item.map(item => item._id === request._id ? { ...item, status: updatedStatus } : item)
-                                    );
-                                  }}><i className="fa-solid fa-pencil"></i> Mark as Request Submitted</button>
-                                  <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteAdoptionRequest(request._id)}><i className="fa-solid fa-trash"></i> Delete Request</button>
-                                </>
+                              request.status == 'Request submitted' &&
+                              <>
+                                <button className="btn btn-danger ms-2" onClick={() => handleDeleteAdoptionRequest(request._id)}> Delete</button>
+                              </>
+                            }
+                            {
+                              request.status == 'Approved' &&
+
+                              <button className="btn btn-danger ms-2" onClick={() => {handleDeleteAdoptionListing(request.pet._id);handleDeleteAdoptionRequest(request._id)}}>Mark as Adopted</button>
+
+
                             } </td>
                         </tr>
                       ))}
