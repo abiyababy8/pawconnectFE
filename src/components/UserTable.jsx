@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Table, Form, Modal } from 'react-bootstrap';
 import { deleteUserApi, editUserApi, editUserRoleApi, getAllUserDetailsApi, registerApi } from '../services/allApi';
+import { toast } from 'react-toastify';
 
 function UserTable() {
     const [users, setUsers] = useState([]);
@@ -44,33 +45,38 @@ function UserTable() {
         getUsers()
     }, [])
     const handleEditUser = async (id, role) => {
-        if(window.confirm(`Are you sure you want to change the user's role to shelter?`)){
+        if (window.confirm(`Are you sure you want to change the user's role to shelter?`)) {
             try {
-            const token = sessionStorage.getItem('token')
-            const reqHeader = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                const token = sessionStorage.getItem('token')
+                const reqHeader = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+                const result = await editUserRoleApi(id, role, reqHeader)
+                getUsers()
+            } catch (error) {
+                console.log(error)
             }
-            const result = await editUserRoleApi(id, role, reqHeader)
-            getUsers()
-        } catch (error) {
-            console.log(error)
-        }
         }
     }
     const handleDeleteUser = async (id) => {
-        try {
-            const token = sessionStorage.getItem('token')
-            const reqHeader = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+        if (window.confirm('Are you sure you want to delete this user?')) {
+            try {
+                const token = sessionStorage.getItem('token')
+                const reqHeader = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+                const result = await deleteUserApi(id, reqHeader)
+                if (result.status === 200) {
+                    toast.success('Deleted the user successfully!')
+                    getUsers()
+                }
+
+            } catch (error) {
+                toast.error('Some error occured.')
+                console.log(error)
             }
-            const result = await deleteUserApi(id, reqHeader)
-            console.log("Deleting User...")
-            console.log(result)
-            getUsers()
-        } catch (error) {
-            console.log(error)
         }
     }
     const handleAddShelter = async () => {
@@ -104,18 +110,22 @@ function UserTable() {
         }
     }
     const handleDeleteShelter = async (id) => {
-        try {
-            const token = sessionStorage.getItem('token')
-            const reqHeader = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+        if (window.confirm('Are you sure you want to delete this shelter?')) {
+            try {
+                const token = sessionStorage.getItem('token')
+                const reqHeader = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+                if (result.status===200) {
+                  toast.success('Deleted the shelter successfully!')  
+                }
+                console.log(result)
+                getUsers()
+            } catch (error) {
+                toast.error('Some error occured.')
+                console.log(error)
             }
-            const result = await deleteUserApi(id, reqHeader)
-            console.log("Deleting Shelter...")
-            console.log(result)
-            getUsers()
-        } catch (error) {
-            console.log(error)
         }
     }
     return (

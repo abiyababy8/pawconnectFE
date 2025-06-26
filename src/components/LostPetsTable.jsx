@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { deleteLostPetApi, getLostPetApi, updateLostPetStatusApi } from '../services/allApi';
 import { Button, Table } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 
 function LostPetsTable() {
     const [lostAndFoundPets, setLostAndFoundPets] = useState([]);
@@ -23,29 +24,43 @@ function LostPetsTable() {
         getLostPets()
     }, [])
     const handleApprovePet = async (id, status) => {
-        try {
-            const token = sessionStorage.getItem("token");
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            };
-            const result = await updateLostPetStatusApi(id, status, headers)
-            getLostPets()
-        } catch (error) {
-            console.log(error)
+        if (window.confirm("Are you sure you want to approve this lost pet listing?")) {
+            try {
+                const token = sessionStorage.getItem("token");
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                };
+                const result = await updateLostPetStatusApi(id, status, headers)
+                if (result.status === 200) {
+                    toast.success('The lost pet listing approved successfully!')
+                    getLostPets()
+                }
+
+            } catch (error) {
+                toast.error('Some error occured')
+                console.log(error)
+            }
         }
     }
     const handleDeleteLostFoundPet = async (id) => {
-        try {
-            const token = sessionStorage.getItem('token')
-            const reqHeader = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+        if (window.confirm("Are you sure you want to delete this lost pet listing?")) {
+            try {
+                const token = sessionStorage.getItem('token')
+                const reqHeader = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+                const result = await deleteLostPetApi(id, reqHeader)
+
+                if (result.status === 200) {
+                    toast.success('Deleted lost pet listing successfully!')
+                    getLostPets()
+                }
+            } catch (error) {
+                toast.error('Some error occured')
+                console.log(error)
             }
-            const result = await deleteLostPetApi(id, reqHeader)
-            getLostPets()
-        } catch (error) {
-            console.log(error)
         }
     }
     return (

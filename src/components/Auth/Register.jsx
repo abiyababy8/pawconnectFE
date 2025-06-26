@@ -76,7 +76,7 @@ function Register() {
         }
 
         if (data.password !== data.confirmPassword) {
-            newErrors.confirmPassword = 'Passwords do not match.';
+            newErrors.confirmPassword = 'Passwords do not match!';
             valid = false;
         }
 
@@ -89,12 +89,12 @@ function Register() {
                 navigate('/login');
             }
             else if (result.status === 401) {
-                toast.error('Something Happened!')
+                toast.error('Cannot Register, some error occured!')
             }
 
         }
         else {
-            toast.error("Something Bad Happened!")
+            toast.error("Cannot Register, some error occured!")
         }
     };
     const handleClear = () => {

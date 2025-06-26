@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
@@ -6,8 +6,10 @@ import Row from 'react-bootstrap/Row';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginApi } from '../../services/allApi';
 import { toast, ToastContainer } from 'react-toastify';
+import { isAuthTokenContext } from '../../Context/ContextShare';
 
 function Login() {
+    const { isAuthToken, setIsAuthToken } = useContext(isAuthTokenContext)
     const [data, setData] = useState({
         username: "",
         password: ""
@@ -29,66 +31,66 @@ function Login() {
     const navigate = useNavigate()
 
     const handleLogin = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    const { username, password } = data;
+        const { username, password } = data;
 
-    if (!username || !password) {
-        toast.warning("Please fill the form completely!");
-        return;
-    }
-
-    let valid = true;
-    let newErrors = { username: "", password: "" };
-
-    if (username.trim() === "") {
-        newErrors.username = "Username is required.";
-        valid = false;
-    }
-
-    if (password.trim() === "") {
-        newErrors.password = "Password is required.";
-        valid = false;
-    } else if (password.length < 6) {
-        newErrors.password = "Password must be at least 6 characters.";
-        valid = false;
-    }
-
-    setErrors(newErrors);
-    if (!valid) return;
-
-    try {
-        const result = await loginApi(data); // login API call
-
-        if (result.status === 200) {
-            const userData = result.data.user_data;
-            const token = result.data.jwt_token;
-
-            // Store token and role info
-            sessionStorage.setItem("user", JSON.stringify(userData));
-            sessionStorage.setItem("token", token);
-
-            // Toast + navigate based on role
-            toast.success(`${userData.role.charAt(0).toUpperCase() + userData.role.slice(1)} Login Successful!`);
-
-            if (userData.role === "admin") {
-                navigate("/admin");
-            } else if (userData.role === "shelter") {
-                navigate("/shelterpanel");
-            } else {
-                navigate("/user-home");
-            }
-
-        } else if (result.status === 406) {
-            toast.error("Invalid Username or Password!");
-        } else {
-            toast.error("Something bad happened!");
+        if (!username || !password) {
+            toast.warning("Please fill the form completely!");
+            return;
         }
-    } catch (error) {
-        console.error("Login API error:", error);
-        toast.error("Something went wrong while logging in.");
-    }
-};
+
+        let valid = true;
+        let newErrors = { username: "", password: "" };
+
+        if (username.trim() === "") {
+            newErrors.username = "Username is required.";
+            valid = false;
+        }
+
+        if (password.trim() === "") {
+            newErrors.password = "Password is required.";
+            valid = false;
+        } else if (password.length < 6) {
+            newErrors.password = "Password must be at least 6 characters.";
+            valid = false;
+        }
+
+        setErrors(newErrors);
+        if (!valid) return;
+
+        try {
+            const result = await loginApi(data); // login API call
+
+            if (result.status === 200) {
+                const userData = result.data.user_data;
+                const token = result.data.jwt_token;
+
+                // Store token and role info
+                sessionStorage.setItem("user", JSON.stringify(userData));
+                sessionStorage.setItem("token", token);
+                setIsAuthToken(true)
+                // Toast + navigate based on role
+                toast.success(`${userData.role.charAt(0).toUpperCase() + userData.role.slice(1)} Login Successful!`);
+
+                if (userData.role === "admin") {
+                    navigate("/admin");
+                } else if (userData.role === "shelter") {
+                    navigate("/shelterpanel");
+                } else {
+                    navigate("/user-home");
+                }
+
+            } else if (result.status === 406) {
+                toast.error("Invalid Username or Password!");
+            } else {
+                toast.error("Something bad happened!");
+            }
+        } catch (error) {
+            console.error("Login API error:", error);
+            toast.error("Something went wrong while logging in.");
+        }
+    };
 
 
 

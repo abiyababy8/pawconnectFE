@@ -95,10 +95,10 @@ function UserHome() {
       const hideTimeout = setTimeout(() => {
         setShowMissingPopup(false);
         setShowAdoptPopup(false);
-      }, 5000); // show for 4 seconds
+      }, 5000); // show for 5 seconds
 
       return () => clearTimeout(hideTimeout);
-    }, 5000); // repeat every 20 seconds
+    }, 5000); // repeat every 5 seconds
 
     return () => clearInterval(interval);
   }, []);

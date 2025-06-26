@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Table } from 'react-bootstrap';
 import { deleteUserPetApi, editUserPetStatusApi, getAllPetDetailsApi } from '../services/allApi';
+import { toast } from 'react-toastify';
 function PetsTable() {
     const [pets, setPets] = useState([]);
     const getPets = async () => {
@@ -22,29 +23,41 @@ function PetsTable() {
         getPets()
     }, [])
     const handleApprovePet = async (id, data) => {
-        try {
-            const token = sessionStorage.getItem("token");
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            };
-            const result = await editUserPetStatusApi(id, data, headers)
-            getPets()
-        } catch (error) {
-            console.log(error)
+        if (window.confirm('Are you sure you want to approve this pet?')) {
+            try {
+                const token = sessionStorage.getItem("token");
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                };
+                const result = await editUserPetStatusApi(id, data, headers)
+                if (result.status===200) {
+                    toast.success('Approved the pet successfully!')
+                    getPets()
+                }
+            } catch (error) {
+                toast.error('Some error occured')
+                console.log(error)
+            }
         }
     }
     const handleDeletePet = async (id) => {
-        try {
-            const token = sessionStorage.getItem('token')
-            const reqHeader = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+        if (window.confirm('Are you sure you want to delete this pet?')) {
+            try {
+                const token = sessionStorage.getItem('token')
+                const reqHeader = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+                const result = await deleteUserPetApi(id, reqHeader)
+                if (result.status) {
+                    toast.success("Deleted the pet successfully!")
+                    getPets()
+                }
+            } catch (error) {
+                toast.error('Some error occured')
+                console.log(error)
             }
-            const result = await deleteUserPetApi(id, reqHeader)
-            getPets()
-        } catch (error) {
-            console.log(error)
         }
     }
     return (

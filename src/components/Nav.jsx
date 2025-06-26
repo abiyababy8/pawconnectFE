@@ -1,7 +1,9 @@
-import { React, useState, useRef, useEffect } from 'react';
+import { React, useState, useRef, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { isAuthTokenContext } from '../Context/ContextShare';
 
 function Nav() {
+    const { isAuthToken, setIsAuthToken } = useContext(isAuthTokenContext)
     const [showDropDown, setShowDropDown] = useState(false);
     const dropdownRef = useRef(null);
     const user = JSON.parse(sessionStorage.getItem("user"));
@@ -35,22 +37,33 @@ function Nav() {
                         style={{ cursor: 'pointer' }}
                     ></i>
                     <br />
-                    {
-                        role === 'admin' ? <span className='me-2'>Hi, Admin</span> :
-                            <span className='me-2'>{username ? <>Hi, {username}</> : ""}</span>
-                    }
+                      {isAuthToken && (
+                        <span className='me-2'>
+                            {role === 'admin' ? 'Hi, Admin' : username ? `Hi, ${username}` : ''}
+                        </span>
+                    )}
+
                     {showDropDown && (
                         <div className="dropdown-menu-custom">
-                            {role === 'user' ? (
-                                <>
-                                    <Link to="/user-home" className="dropdown-items">Home</Link>
-                                    <Link to="/profile" className="dropdown-items">My Profile</Link>
-                                    <Link to="/" className="dropdown-items" onClick={() => sessionStorage.clear()}>Log Out</Link>
-                                </>
-                            ) : role === 'admin' || role === 'shelter' ? (
-                                <Link to="/" className="dropdown-items" onClick={() => sessionStorage.clear()}>Log Out</Link>
+                            {isAuthToken ? (
+                                role === 'user' ? (
+                                    <>
+                                        <Link to="/user-home" className="dropdown-items">Home</Link>
+                                        <Link to="/profile" className="dropdown-items">My Profile</Link>
+                                        <Link to="/" className="dropdown-items" onClick={() => {
+                                            sessionStorage.clear();
+                                            setIsAuthToken(false);
+                                        }}>Log Out <i className="fa-solid fa-arrow-up-right-from-square"></i></Link>
+                                    </>
+                                ) : (
+                                    // for admin or shelter
+                                    <Link to="/" className="dropdown-items" onClick={() => {
+                                        sessionStorage.clear();
+                                        setIsAuthToken(false);
+                                    }}>Log Out <i className="fa-solid fa-arrow-up-right-from-square"></i></Link>
+                                )
                             ) : (
-                                <Link to="/login" className="dropdown-items">Log In</Link>
+                                <Link to="/login" className="dropdown-items">Log In  <i className="fa-solid fa-arrow-up-right-from-square"></i></Link>
                             )}
                         </div>
                     )}

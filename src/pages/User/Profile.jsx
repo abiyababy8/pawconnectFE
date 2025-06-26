@@ -7,12 +7,6 @@ import LostPets from "../LostPets";
 
 function Profile() {
   const [selectedSection, setSelectedSection] = useState("profile");
-  const [showFoundPetModal, setShowFoundPetModal] = useState(false);
-  const [showAddPetModal, setShowAddPetModal] = useState(false);
-  const [showLostPetModal, setShowLostPetModal] = useState(false);
-  const [showAdoptPetModal, setShowAdoptPetModal] = useState(false);
-  const [selectedLostPet, setSelectedLostPet] = useState(null);
-  const [selectedPetForAdoption, setSelectedPetForAdoption] = useState(null);
   const [userDetails, setUserDetails] = useState({
     _id: '',
     username: '',
@@ -41,15 +35,7 @@ function Profile() {
   useEffect(() => {
     getUserDetails()
   }, [])
-  const handleReportFoundPet = (pet) => {
-    setSelectedLostPet(pet);
-    setShowFoundPetModal(true);
-  };
-
-  const handleAdoptPet = (pet) => {
-    setSelectedPetForAdoption(pet);
-    setShowAdoptPetModal(true);
-  };
+  
   const handleEditUserDetails = async () => {
     try {
       const { _id } = userDetails
@@ -126,16 +112,16 @@ function Profile() {
       const reqHeader = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
-      };
+      }
       const result = await deleteAdoptListApi(id, reqHeader);
       console.log("Deleted Adoption Listing", result);
-      // Remove from UI
-      setPetsGivenForAdoption(petsGivenForAdoption.filter(pet => pet._id !== id));
+      
+      //setPetsGivenForAdoption(petsGivenForAdoption.filter(pet => pet._id !== id));
       getMyAdoptionListings()
     } catch (error) {
       console.error("Failed to delete adoption listing:", error);
     }
-  };
+  }
 
   const handleDeleteAdoptionRequest = async (id) => {
     try {
@@ -146,13 +132,13 @@ function Profile() {
       };
       const result = await deleteAdoptRequestApi(id, reqHeader);
       console.log("Deleted Adoption Request", result);
-      // Remove from UI
-      setAdoptionRequests(adoptionRequests.filter(request => request._id !== id));
+      
+     // setAdoptionRequests(adoptionRequests.filter(request => request._id !== id));
       getMyAdoptionRequests()
     } catch (error) {
       console.error("Failed to delete adoption request:", error);
     }
-  };
+  }
 
   const handleDeleteLostPetListing = async (id) => {
     try {
@@ -163,61 +149,11 @@ function Profile() {
       };
       const result = await deleteLostPetApi(id, reqHeader);
       console.log("Deleted Lost Pet Listing", result);
-      // Remove from UI
-      setMyLostPets(myLostPets.filter(pet => pet._id !== id));
+      
+      //setMyLostPets(myLostPets.filter(pet => pet._id !== id));
       getMyLostPets()
     } catch (error) {
       console.error("Failed to delete lost pet listing:", error);
-    }
-  };
-
-  const updateAdoptionListing = async (petId, status) => {
-    try {
-      const token = sessionStorage.getItem("token");
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      };
-      const result = await updateAdoptListStatusApi(petId, status, headers);
-      console.log("Updated Adoption Listing", result);
-      // Update UI
-      setPetsGivenForAdoption(prev =>
-        prev.map(pet => pet._id === petId ? { ...pet, status } : pet)
-      );
-    } catch (error) {
-      console.error("Failed to update adoption listing status:", error);
-    }
-  };
-
-  const updateAdoptionRequest = async (requestId, status) => {
-    try {
-      const token = sessionStorage.getItem("token");
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      };
-      const result = await updateAdoptRequestStatusApi(requestId, status, headers);
-      console.log("Updated Adoption Request", result);
-      // Update UI
-      setAdoptionRequests(prev =>
-        prev.map(req => req._id === requestId ? { ...req, status } : req)
-      );
-    } catch (error) {
-      console.error("Failed to update adoption request status:", error);
-    }
-  };
-
-  const updateLostPetStatus = async (id, status) => {
-    try {
-      const token = sessionStorage.getItem("token")
-      const reqHeader = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-      const result = await updateLostPetStatusApi(id, status, reqHeader)
-      console.log(result)
-    } catch (error) {
-      console.log(error)
     }
   }
   return (
@@ -278,12 +214,12 @@ function Profile() {
                             {
                               pet.status == 'Pending' &&
                               <>
-                                <button className="btn btn-danger ms-2" onClick={() => handleDeleteAdoptionListing(pet._id)}> Delete</button>
+                                <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteAdoptionListing(pet._id)}><i className="fa-solid fa-trash"></i> Delete Listing</button>
                               </>
                             }
                             {pet.status === 'Approved' &&
                               <>
-                                <button className="btn btn-danger ms-2" onClick={() => handleDeleteAdoptionListing(pet._id)}> Mark as Adopted</button>
+                                <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteAdoptionListing(pet._id)}><i className="fa-solid fa-pencil"></i> Mark as Adopted</button>
                               </>
                             }
 
@@ -315,13 +251,13 @@ function Profile() {
                             {
                               request.status == 'Request submitted' &&
                               <>
-                                <button className="btn btn-danger ms-2" onClick={() => handleDeleteAdoptionRequest(request._id)}> Delete</button>
+                                <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteAdoptionRequest(request._id)}><i className="fa-solid fa-trash"></i> Delete Listing</button>
                               </>
                             }
                             {
                               request.status == 'Approved' &&
 
-                              <button className="btn btn-danger ms-2" onClick={() => {handleDeleteAdoptionListing(request.pet._id);handleDeleteAdoptionRequest(request._id)}}>Mark as Adopted</button>
+                              <button className="btn btn-outline-danger ms-2" onClick={() => { handleDeleteAdoptionListing(request.pet._id); handleDeleteAdoptionRequest(request._id) }}><i className="fa-solid fa-pencil"></i> Mark as Adopted</button>
 
 
                             } </td>
@@ -356,25 +292,11 @@ function Profile() {
                           <td>{pet.status}</td>
                           <td>
                             {
-                              pet.status == 'Not Found' ?
+                              pet.status == 'Not Found' &&
                                 <>
-                                  <button className="btn btn-outline-primary" onClick={() => {
-                                    const updatedStatus = "Found";
-                                    updateLostPetStatus(pet._id, updatedStatus);
-                                    setMyLostPets(item =>
-                                      item.map(item => item._id === pet._id ? { ...item, status: updatedStatus } : item)
-                                    );
-                                  }}><i className="fa-solid fa-pencil"></i> Mark as Found</button>
-                                  <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteLostPetListing(pet._id)}><i className="fa-solid fa-trash"></i> Delete Listing</button>
-                                </> :
+                                  <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteLostPetListing(pet._id)}><i className="fa-solid fa-pencil"></i> Mark as Found</button>
+                                </> }{pet.status == 'Found' &&
                                 <>
-                                  <button className="btn btn-outline-primary" onClick={() => {
-                                    const updatedStatus = "Not Found";
-                                    updateLostPetStatus(pet._id, updatedStatus);
-                                    setMyLostPets(item =>
-                                      item.map(item => item._id === pet._id ? { ...item, status: updatedStatus } : item)
-                                    );
-                                  }}><i className="fa-solid fa-pencil"></i> Mark as Not Found</button>
                                   <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteLostPetListing(pet._id)}><i className="fa-solid fa-trash"></i> Delete Listing</button>
                                 </>
                             }

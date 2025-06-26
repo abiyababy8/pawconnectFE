@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { deleteAdoptRequestApi, getAllAdoptRequestApi, updateAdoptRequestStatusApi } from '../services/allApi';
 import { Button, Table } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 
 function PetAdoptionTable() {
     const [adoptions, setAdoptions] = useState([]);
@@ -23,30 +24,45 @@ function PetAdoptionTable() {
         getAdoptionRequests()
     }, [])
     const handleApproveAdoptionRequest = async (id, status) => {
-        try {
-            const token = sessionStorage.getItem("token");
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            };
-            const result = await updateAdoptRequestStatusApi(id, status, headers)
-            getAdoptionRequests()
-        } catch (error) {
-            console.log(error)
+        if (window.confirm("Are you sure you want to approve this adoption request?")) {
+            try {
+                const token = sessionStorage.getItem("token");
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                };
+                const result = await updateAdoptRequestStatusApi(id, status, headers)
+                if (result.status===200) {
+                    toast.success('Approved Adoption request successfully!')
+                    getAdoptionRequests()
+                }
+            } catch (error) {
+                toast.error('Some error occured')
+                console.log(error)
+            }
         }
+
     }
     const handleDeleteAdoptionRequest = async (id) => {
-        try {
-            const token = sessionStorage.getItem('token')
-            const reqHeader = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+        if (window.confirm("Are you sure you want to delete this adoption request?")) {
+            try {
+                const token = sessionStorage.getItem('token')
+                const reqHeader = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+                const result = await deleteAdoptRequestApi(id, reqHeader)
+                if (result.status === 200) {
+                    toast.success('Deleted the Adoption request successfully!')
+                    getAdoptionRequests()
+                }
+                
+            } catch (error) {
+                toast.error('Some error occured')
+                console.log(error)
             }
-            const result = await deleteAdoptRequestApi(id, reqHeader)
-            getAdoptionRequests()
-        } catch (error) {
-            console.log(error)
         }
+
     }
     return (
         <>

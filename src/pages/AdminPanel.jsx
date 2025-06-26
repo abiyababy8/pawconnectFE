@@ -6,6 +6,7 @@ import UserTable from "../components/UserTable";
 import PetsTable from "../components/PetsTable";
 import LostPetsTable from "../components/LostPetsTable";
 import PetAdoptionTable from "../components/PetAdoptionTable";
+import { ToastContainer } from "react-toastify";
 
 
 function AdminPanel() {
@@ -134,6 +135,7 @@ function AdminPanel() {
                     )}
                 </Col>
             </Row>
+            <ToastContainer autoClose={2000}/>
         </Container>
     );
 }
