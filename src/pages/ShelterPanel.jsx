@@ -3,6 +3,7 @@ import { Container, Row, Col, Table, Button, Modal, Form } from "react-bootstrap
 import "../App.css";
 import { addAdoptPetDetailsApi, deleteAdoptListApi, deleteAdoptRequestApi, getAllAdoptRequestApi, getUserAdoptListApi, updateAdoptListApi, updateAdoptRequestStatusApi } from "../services/allApi";
 import { base_url } from "../services/base_url";
+import { ToastContainer } from "react-toastify";
 
 function ShelterPanel() {
   const [showAddPetModal, setShowAddPetModal] = useState(false);
@@ -70,9 +71,17 @@ function ShelterPanel() {
       handleCloseAddPetModal()
       setImagePreview(null);
       getShelterPets();
-      //toast.success(`${name} added successfully!`);
+      if (result.status === 201) {
+        toast.success(`${name} added successfully!`);
+      }
+      else if (result.status === 406) {
+        toast.warning(`${name} was already added!`);
+      }
+      else {
+        toast.error('Could not add the pet, some error occured!')
+      }
     } catch (err) {
-      //toast.error("Something went wrong while adding the pet.");
+      toast.error("Something went wrong while adding the pet.");
       console.log("Error:", err);
     }
   };
@@ -86,6 +95,12 @@ function ShelterPanel() {
       };
       const result = await deleteAdoptListApi(id, reqHeader)
       getShelterPets()
+      if (result.status === 200) {
+        toast.success("Deleted successfully!")
+      }
+      else {
+        toast.error('Could not delete, some error occured!')
+      }
     } catch (error) {
       console.log(error)
     }
@@ -118,6 +133,12 @@ function ShelterPanel() {
       const result = await updateAdoptListApi(id, reqBody, reqHeader)
       getShelterPets()
       handleCloseEditPetModal()
+      if (result.status === 200) {
+        toast.success("Update successful!")
+      }
+      else {
+        toast.error('Could not Update, some error occured!')
+      }
     } catch (error) {
       console.log(error)
     }
@@ -132,6 +153,12 @@ function ShelterPanel() {
       };
       const result = await updateAdoptRequestStatusApi(id, status, reqHeader)
       getAdoptRequests()
+      if (result.status === 200) {
+        toast.success("Approve successful!")
+      }
+      else {
+        toast.error('Could not Approve, some error occured!')
+      }
     } catch (error) {
       console.log(error)
     }
@@ -146,6 +173,12 @@ function ShelterPanel() {
       };
       const result = await deleteAdoptRequestApi(id, reqHeader)
       getAdoptRequests()
+      if (result.status === 200) {
+        toast.success("Rejection successful!")
+      }
+      else {
+        toast.error('Could not Reject, some error occured!')
+      }
     } catch (error) {
       console.log(error)
     }
@@ -445,6 +478,7 @@ function ShelterPanel() {
           )}
         </Col>
       </Row>
+      <ToastContainer autoClose={2000} />
     </Container>
   );
 }

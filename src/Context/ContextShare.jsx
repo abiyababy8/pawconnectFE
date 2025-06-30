@@ -7,7 +7,7 @@ function ContextShare({ children }) {
             <isAuthTokenContext.Provider
                 value={{ isAuthToken, setIsAuthToken }}
             >
-                { children }
+                {children}
             </isAuthTokenContext.Provider>
         </>
     )

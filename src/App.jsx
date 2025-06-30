@@ -32,6 +32,7 @@ function App() {
         <Route path="/lost-pets" element={<LostPets/>} />
       </Routes>
       <Footer />
+      
   </>
   );
 }

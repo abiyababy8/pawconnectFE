@@ -28,7 +28,7 @@ function UserHome() {
     nextVetAppointment: "",
     vaccinations: "",
     userPetImage: "",
-    status:''
+    status: ''
   })
   const [editPetDetails, setEditPetDetails] = useState({
     name: "",
@@ -124,6 +124,15 @@ function UserHome() {
       console.log("Result:", result)
       setShowAddPetModal(false)
       getUserPet()
+      if (result.status === 201) {
+        toast.success("Added Pet Successfully!")
+      }
+      else if (result.status === 406) {
+        toast.warning(`${name} is already added!`)
+      }
+      else {
+        toast.error("Could not add, some error occured!")
+      }
     }
   }
   const handleEditUserPet = async () => {

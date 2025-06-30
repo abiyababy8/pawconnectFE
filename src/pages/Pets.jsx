@@ -66,7 +66,12 @@ function Pets() {
       setImagePreview(null);
       setShowAddPetModal(false);
       getAdoptPetListing();
-      toast.success(`${name} added successfully!`);
+      if (result.status === 201) {
+        toast.success(`${name} added successfully!`);
+      }
+      else {
+        toast.error("Could not add pet, some error occured")
+      }
     } catch (err) {
       toast.error("Something went wrong while adding the pet.");
       console.log("Error:", err);
@@ -184,7 +189,7 @@ function Pets() {
                   pet.owner === user.name ?
                     <>
                       <Link to={'/profile'} style={{ color: 'black', textDecoration: 'none' }} >
-                       <Button variant='info'> Check Status</Button>
+                        <Button variant='info'> Check Status</Button>
                       </Link>
                     </>
                     :
@@ -310,7 +315,7 @@ function Pets() {
         </Modal.Footer>
       </Modal>
 
-      <ToastContainer />
+      <ToastContainer autoClose={2000} />
     </Container>
   );
 }

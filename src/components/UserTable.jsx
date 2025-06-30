@@ -117,8 +117,8 @@ function UserTable() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 }
-                if (result.status===200) {
-                  toast.success('Deleted the shelter successfully!')  
+                if (result.status === 200) {
+                    toast.success('Deleted the shelter successfully!')
                 }
                 console.log(result)
                 getUsers()

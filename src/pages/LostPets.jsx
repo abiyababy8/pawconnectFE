@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, Container, Row, Col, Modal, Form } from 'react-bootstrap';
 import '../App.css';
 import { addLostPetApi, getLostPetApi, updateLostPetLocationApi } from '../services/allApi';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { base_url } from '../services/base_url';
 import { Link } from 'react-router-dom';
 
@@ -45,11 +45,15 @@ function LostPets() {
         try {
             const result = await updateLostPetLocationApi(selectedPetId, foundLocation, reqHeader);
             toast.success("Location updated successfully!", result);
-
-            // Refresh list to reflect changes
             getLostPet();
             setFoundLocation('');
             setShowFoundModal(false);
+            if (result.status === 200) {
+                toast.success("Location updated successfully!")
+            }
+            else {
+                toast.error("Could not complete the task, some error occured!")
+            }
         } catch (error) {
             toast.error("Failed to update location.");
             console.error(error);
@@ -82,13 +86,18 @@ function LostPets() {
         try {
             const result = await addLostPetApi(reqBody, reqHeader);
             console.log("Lost Pet Reported:", result);
-            toast.success("Lost pet reported successfully!");
             getLostPet();
             setNewLostPet({
                 name: '', type: '', description: '', owner: user.name, location: '', lostPetImage: ''
             });
             setImagePreview(null);
             setShowLostModal(false);
+            if (result.status === 201) {
+                toast.success("Lost pet reported successfully!");
+            }
+            else {
+                toast.error("Could not report, some error occured!")
+            }
         } catch (error) {
             toast.error("Something went wrong while reporting the lost pet.");
             console.error("Error:", error);
@@ -265,6 +274,7 @@ function LostPets() {
                     <Button variant="warning" onClick={handleReportLostPet}>Submit</Button>
                 </Modal.Footer>
             </Modal>
+            <ToastContainer autoClose={2000} />
         </Container>
     );
 }

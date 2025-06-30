@@ -31,7 +31,7 @@ function PetsTable() {
                     'Authorization': `Bearer ${token}`
                 };
                 const result = await editUserPetStatusApi(id, data, headers)
-                if (result.status===200) {
+                if (result.status === 200) {
                     toast.success('Approved the pet successfully!')
                     getPets()
                 }

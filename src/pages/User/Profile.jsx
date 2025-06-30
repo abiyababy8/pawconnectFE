@@ -4,6 +4,7 @@ import "../../App.css";
 import { editUserApi, getUserAdoptListApi, getUserAdoptRequestApi, getUserDetailsApi, getUserLostPetApi, updateLostPetStatusApi, deleteAdoptListApi, deleteAdoptRequestApi, deleteLostPetApi, updateAdoptListStatusApi, updateAdoptRequestStatusApi } from "../../services/allApi";
 import { Link } from "react-router-dom";
 import LostPets from "../LostPets";
+import { toast, ToastContainer } from "react-toastify";
 
 function Profile() {
   const [selectedSection, setSelectedSection] = useState("profile");
@@ -35,7 +36,7 @@ function Profile() {
   useEffect(() => {
     getUserDetails()
   }, [])
-  
+
   const handleEditUserDetails = async () => {
     try {
       const { _id } = userDetails
@@ -50,6 +51,13 @@ function Profile() {
       const result = await editUserApi(_id, userDetails, requestHeader)
       console.log(result)
       handleClose()
+      if (result.status === 200) {
+        toast.success("Edited user details successfully!")
+      }
+      else {
+        toast.error("Could not edit, some error occured!")
+      }
+
     } catch (error) {
       console.log(error)
     }
@@ -115,9 +123,15 @@ function Profile() {
       }
       const result = await deleteAdoptListApi(id, reqHeader);
       console.log("Deleted Adoption Listing", result);
-      
+
       //setPetsGivenForAdoption(petsGivenForAdoption.filter(pet => pet._id !== id));
       getMyAdoptionListings()
+      if (result.status === 200) {
+        toast.success("Deleted Listing Successfully!")
+      }
+      else {
+        toast.error("Could not delete, some error occured!")
+      }
     } catch (error) {
       console.error("Failed to delete adoption listing:", error);
     }
@@ -132,9 +146,15 @@ function Profile() {
       };
       const result = await deleteAdoptRequestApi(id, reqHeader);
       console.log("Deleted Adoption Request", result);
-      
-     // setAdoptionRequests(adoptionRequests.filter(request => request._id !== id));
+
+      // setAdoptionRequests(adoptionRequests.filter(request => request._id !== id));
       getMyAdoptionRequests()
+      if (result.status === 200) {
+        toast.success("Deleted Request Successfully!")
+      }
+      else {
+        toast.error("Could not delete, some error occured!")
+      }
     } catch (error) {
       console.error("Failed to delete adoption request:", error);
     }
@@ -149,9 +169,15 @@ function Profile() {
       };
       const result = await deleteLostPetApi(id, reqHeader);
       console.log("Deleted Lost Pet Listing", result);
-      
+
       //setMyLostPets(myLostPets.filter(pet => pet._id !== id));
       getMyLostPets()
+      if (result.status === 200) {
+        toast.success("Deleted Listing Successfully!")
+      }
+      else {
+        toast.error("Could not delete, some error occured!")
+      }
     } catch (error) {
       console.error("Failed to delete lost pet listing:", error);
     }
@@ -293,9 +319,9 @@ function Profile() {
                           <td>
                             {
                               pet.status == 'Not Found' &&
-                                <>
-                                  <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteLostPetListing(pet._id)}><i className="fa-solid fa-pencil"></i> Mark as Found</button>
-                                </> }{pet.status == 'Found' &&
+                              <>
+                                <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteLostPetListing(pet._id)}><i className="fa-solid fa-pencil"></i> Mark as Found</button>
+                              </>}{pet.status == 'Found' &&
                                 <>
                                   <button className="btn btn-outline-danger ms-2" onClick={() => handleDeleteLostPetListing(pet._id)}><i className="fa-solid fa-trash"></i> Delete Listing</button>
                                 </>
@@ -340,6 +366,7 @@ function Profile() {
           </Button>
         </Modal.Footer>
       </Modal>
+      <ToastContainer autoClose={2000} />
     </Container>
 
   );

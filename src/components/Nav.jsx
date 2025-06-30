@@ -37,7 +37,7 @@ function Nav() {
                         style={{ cursor: 'pointer' }}
                     ></i>
                     <br />
-                      {isAuthToken && (
+                    {isAuthToken && (
                         <span className='me-2'>
                             {role === 'admin' ? 'Hi, Admin' : username ? `Hi, ${username}` : ''}
                         </span>

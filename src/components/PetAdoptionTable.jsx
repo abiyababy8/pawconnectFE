@@ -32,7 +32,7 @@ function PetAdoptionTable() {
                     'Authorization': `Bearer ${token}`
                 };
                 const result = await updateAdoptRequestStatusApi(id, status, headers)
-                if (result.status===200) {
+                if (result.status === 200) {
                     toast.success('Approved Adoption request successfully!')
                     getAdoptionRequests()
                 }
@@ -56,7 +56,7 @@ function PetAdoptionTable() {
                     toast.success('Deleted the Adoption request successfully!')
                     getAdoptionRequests()
                 }
-                
+
             } catch (error) {
                 toast.error('Some error occured')
                 console.log(error)

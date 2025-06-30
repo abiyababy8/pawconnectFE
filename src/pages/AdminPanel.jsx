@@ -33,7 +33,7 @@ function AdminPanel() {
 
             const usersRes = await getAllUserDetailsApi(reqHeader);
             const users = usersRes?.data || [];
-            const normalUsers = users.filter(user => user.role === "user" );
+            const normalUsers = users.filter(user => user.role === "user");
             const shelters = users.filter(user => user.role === "shelter");
 
             const petsRes = await getAllPetDetailsApi(reqHeader);
@@ -101,17 +101,17 @@ function AdminPanel() {
                             </Row>
 
                             {
-                                counts.lostPets>0?
-                                <>
-                                <h4 className="mt-5">🔥 Most Reported Locations </h4>
-                            <ul>
-                                {Object.entries(counts.hotspots).map(([location, count]) => (
-                                    <li key={location}> 📍 {location}: {count} reports</li>
-                                ))}
-                            </ul>
-                                </>:
-                                <>
-                                </>
+                                counts.lostPets > 0 ?
+                                    <>
+                                        <h4 className="mt-5">🔥 Most Reported Locations </h4>
+                                        <ul>
+                                            {Object.entries(counts.hotspots).map(([location, count]) => (
+                                                <li key={location}> 📍 {location}: {count} reports</li>
+                                            ))}
+                                        </ul>
+                                    </> :
+                                    <>
+                                    </>
                             }
                         </>
                     )}
@@ -130,12 +130,12 @@ function AdminPanel() {
 
                     {selectedSection === "adoptions" && (
                         <>
-                        <PetAdoptionTable />
+                            <PetAdoptionTable />
                         </>
                     )}
                 </Col>
             </Row>
-            <ToastContainer autoClose={2000}/>
+            <ToastContainer autoClose={2000} />
         </Container>
     );
 }

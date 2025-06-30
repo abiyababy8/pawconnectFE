@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 function Home() {
   return (
     <div className="home-container d-flex justify-content-center align-items-center flex-column text-center">
-      
+
       {/* Hero Section */}
       <h1 className="home-title">Welcome to PawConnect <i className="fa-solid fa-paw"></i></h1>
       <p className="home-subtitle">

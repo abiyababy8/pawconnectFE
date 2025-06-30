@@ -15,7 +15,7 @@ function Register() {
         phone: '',
         password: '',
         confirmPassword: '',
-        role:'user'
+        role: 'user'
     });
 
     const [errors, setErrors] = useState({
@@ -105,7 +105,7 @@ function Register() {
             phone: '',
             password: '',
             confirmPassword: '',
-            role:'user'
+            role: 'user'
         });
         setErrors({
             name: '',
