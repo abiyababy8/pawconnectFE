@@ -3,7 +3,7 @@ import { Container, Row, Col, Table, Button, Modal, Form } from "react-bootstrap
 import "../App.css";
 import { addAdoptPetDetailsApi, deleteAdoptListApi, deleteAdoptRequestApi, getAllAdoptRequestApi, getUserAdoptListApi, updateAdoptListApi, updateAdoptRequestStatusApi } from "../services/allApi";
 import { base_url } from "../services/base_url";
-import { ToastContainer } from "react-toastify";
+import {toast,ToastContainer } from "react-toastify";
 
 function ShelterPanel() {
   const [showAddPetModal, setShowAddPetModal] = useState(false);
