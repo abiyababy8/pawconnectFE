@@ -100,7 +100,7 @@ function UserHome() {
       }, 10000); // show for 5 seconds
 
       return () => clearTimeout(hideTimeout);
-    }, 2000); // repeat every 5 seconds
+    }, 12000); // repeat every 5 seconds
 
     return () => clearInterval(interval);
   }, []);
