@@ -5,6 +5,8 @@ import { Modal, Button, Form } from 'react-bootstrap'
 import { toast, ToastContainer } from "react-toastify";
 import { addUserPetApi, getUserPetApi, editUserPetApi, deleteUserPetApi } from "../../services/allApi";
 import { base_url } from "../../services/base_url";
+import tabbyCat from '../../assets/tabby-cat.jpg';
+import goldenRetriver from '../../assets/golden-retriever.jpg'
 
 function UserHome() {
   const user = JSON.parse(sessionStorage.getItem("user"));
@@ -289,7 +291,7 @@ function UserHome() {
       >
         <h6>🚨 MISSING!</h6>
         <img
-          src="http://localhost:5173/src/assets/tabby-cat.jpg"
+          src={tabbyCat}
           alt="Missing Pet"
           onClick={() => navigate("/lost-pets")}
           style={{ cursor: "pointer", width: "100%", borderRadius: "8px" }}
@@ -313,7 +315,7 @@ function UserHome() {
       >
         <h6>🐶 ADOPT!</h6>
         <img
-          src="http://localhost:5173/src/assets/golden-retriever.jpg"
+          src={goldenRetriver}
           alt="Adoptable Pet"
           onClick={() => navigate("/adopt-pets")}
           style={{ cursor: "pointer", width: "100%", borderRadius: "8px" }}
